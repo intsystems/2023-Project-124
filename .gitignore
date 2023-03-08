@@ -120,3 +120,6 @@ logs/
 */mnist
 *.csv
 !.dvc
+
+code/datasets/
+*.pt
