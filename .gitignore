@@ -123,3 +123,4 @@ logs/
 
 code/datasets/
 *.pt
+code/generated_ddpm_FMNIST/

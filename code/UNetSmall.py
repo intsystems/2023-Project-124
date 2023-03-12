@@ -2,18 +2,6 @@ import torch.nn as nn
 import torch
 
 
-def sinusoidal_embedding(n, d):
-    # Returns the standard positional embedding
-    embedding = torch.zeros(n, d)
-    wk = torch.tensor([1 / 10_000 ** (2 * j / d) for j in range(d)])
-    wk = wk.reshape((1, d))
-    t = torch.arange(n).reshape((n, 1))
-    embedding[:, ::2] = torch.sin(t * wk[:, ::2])
-    embedding[:, 1::2] = torch.cos(t * wk[:, ::2])
-
-    return embedding
-
-
 def _make_te(self, dim_in, dim_out):
     return nn.Sequential(
         nn.Linear(dim_in, dim_out),
@@ -22,10 +10,10 @@ def _make_te(self, dim_in, dim_out):
     )
 
 
-class MyBlock(nn.Module):
+class DoubleConv(nn.Module):
     def __init__(self, shape, in_c, out_c, kernel_size=3, stride=1,
                  padding=1, activation=None, normalize=True):
-        super(MyBlock, self).__init__()
+        super(DoubleConv, self).__init__()
         self.ln = nn.LayerNorm(shape)
         self.conv1 = nn.Conv2d(in_c, out_c, kernel_size, stride, padding)
         self.conv2 = nn.Conv2d(out_c, out_c, kernel_size, stride, padding)
@@ -42,36 +30,31 @@ class MyBlock(nn.Module):
 
 
 class UNetSmall(nn.Module):
-    def __init__(self, n_steps=1000, time_emb_dim=100, in_channels=1, out_channels=1):
+    def __init__(self, time_emb_dim=100, in_channels=1, out_channels=1):
         super(UNetSmall, self).__init__()
-
-        # Sinusoidal embedding
-        self.time_embed = nn.Embedding(n_steps, time_emb_dim)
-        self.time_embed.weight.data = sinusoidal_embedding(n_steps, time_emb_dim)
-        self.time_embed.requires_grad_(False)
 
         # First half
         self.te1 = self._make_te(time_emb_dim, in_channels)
         self.b1 = nn.Sequential(
-            MyBlock((in_channels, 28, 28), in_channels, 15),
-            MyBlock((15, 28, 28), 15, 15),
-            MyBlock((15, 28, 28), 15, 15)
+            DoubleConv((in_channels, 28, 28), in_channels, 15),
+            DoubleConv((15, 28, 28), 15, 15),
+            DoubleConv((15, 28, 28), 15, 15)
         )
         self.down1 = nn.MaxPool2d(2, 2)
 
         self.te2 = self._make_te(time_emb_dim, 15)
         self.b2 = nn.Sequential(
-            MyBlock((15, 14, 14), 15, 30),
-            MyBlock((30, 14, 14), 30, 30),
-            MyBlock((30, 14, 14), 30, 30)
+            DoubleConv((15, 14, 14), 15, 30),
+            DoubleConv((30, 14, 14), 30, 30),
+            DoubleConv((30, 14, 14), 30, 30)
         )
         self.down2 = nn.MaxPool2d(2, 2)
 
         self.te3 = self._make_te(time_emb_dim, 30)
         self.b3 = nn.Sequential(
-            MyBlock((30, 7, 7), 30, 60),
-            MyBlock((60, 7, 7), 60, 60),
-            MyBlock((60, 7, 7), 60, 60)
+            DoubleConv((30, 7, 7), 30, 60),
+            DoubleConv((60, 7, 7), 60, 60),
+            DoubleConv((60, 7, 7), 60, 60)
         )
         self.down3 = nn.Sequential(
             nn.Conv2d(60, 60, 2, 1),
@@ -82,9 +65,9 @@ class UNetSmall(nn.Module):
         # Bottleneck
         self.te_mid = self._make_te(time_emb_dim, 60)
         self.b_mid = nn.Sequential(
-            MyBlock((60, 3, 3), 60, 30),
-            MyBlock((30, 3, 3), 30, 30),
-            MyBlock((30, 3, 3), 30, 60)
+            DoubleConv((60, 3, 3), 60, 30),
+            DoubleConv((30, 3, 3), 30, 30),
+            DoubleConv((30, 3, 3), 30, 60)
         )
 
         # Second half
@@ -96,32 +79,31 @@ class UNetSmall(nn.Module):
 
         self.te4 = self._make_te(time_emb_dim, 120)
         self.b4 = nn.Sequential(
-            MyBlock((120, 7, 7), 120, 60),
-            MyBlock((60, 7, 7), 60, 30),
-            MyBlock((30, 7, 7), 30, 30)
+            DoubleConv((120, 7, 7), 120, 60),
+            DoubleConv((60, 7, 7), 60, 30),
+            DoubleConv((30, 7, 7), 30, 30)
         )
 
         self.up2 = nn.ConvTranspose2d(30, 30, 4, 2, 1)
         self.te5 = self._make_te(time_emb_dim, 60)
         self.b5 = nn.Sequential(
-            MyBlock((60, 14, 14), 60, 30),
-            MyBlock((30, 14, 14), 30, 15),
-            MyBlock((15, 14, 14), 15, 15)
+            DoubleConv((60, 14, 14), 60, 30),
+            DoubleConv((30, 14, 14), 30, 15),
+            DoubleConv((15, 14, 14), 15, 15)
         )
 
         self.up3 = nn.ConvTranspose2d(15, 15, 4, 2, 1)
         self.te_out = self._make_te(time_emb_dim, 30)
         self.b_out = nn.Sequential(
-            MyBlock((30, 28, 28), 30, 15),
-            MyBlock((15, 28, 28), 15, 15),
-            MyBlock((15, 28, 28), 15, 15, normalize=False)
+            DoubleConv((30, 28, 28), 30, 15),
+            DoubleConv((15, 28, 28), 15, 15),
+            DoubleConv((15, 28, 28), 15, 15, normalize=False)
         )
 
         self.conv_out = nn.Conv2d(15, out_channels, 3, 1, 1)
 
     def forward(self, x, t):
 
-        t = self.time_embed(t)
         n = len(x)
         out1 = self.b1(x + self.te1(t).reshape(n, -1, 1, 1))
         out2 = self.b2(self.down1(out1) + self.te2(t).reshape(n, -1, 1, 1))
@@ -141,7 +123,6 @@ class UNetSmall(nn.Module):
         out = self.conv_out(out)
 
         return out
-
 
     def _make_te(self, dim_in, dim_out):
         return nn.Sequential(
