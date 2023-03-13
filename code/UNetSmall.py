@@ -2,14 +2,6 @@ import torch.nn as nn
 import torch
 
 
-def _make_te(self, dim_in, dim_out):
-    return nn.Sequential(
-        nn.Linear(dim_in, dim_out),
-        nn.SiLU(),
-        nn.Linear(dim_out, dim_out)
-    )
-
-
 class DoubleConv(nn.Module):
     def __init__(self, shape, in_c, out_c, kernel_size=3, stride=1,
                  padding=1, activation=None, normalize=True):

@@ -109,7 +109,7 @@ def FID_score(path_real, path_fake, real_saved=False, num_features=100):
 
     # Extract the features for the real and fake images
 
-    fake_features = extract_features(fake_loader, num_features)
+    fake_features = extract_features(fake_loader, batch_size=50, num_classes=num_features)
 
     # Calculate the FID score
     fid = calculate_fid(real_features, fake_features)
