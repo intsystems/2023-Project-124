@@ -30,7 +30,7 @@ class DoubleConv(nn.Module):
 
 
 class UNetSmall(nn.Module):
-    def __init__(self, time_emb_dim=100, in_channels=1, out_channels=1):
+    def __init__(self, time_emb_dim=300, in_channels=1, out_channels=1):
         super(UNetSmall, self).__init__()
 
         # First half
