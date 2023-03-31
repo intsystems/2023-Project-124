@@ -57,9 +57,9 @@ class UNetSmall(nn.Module):
         # Bottleneck
         self.te_mid = self._make_te(time_emb_dim, 60)
         self.b_mid = nn.Sequential(
-            DoubleConv((60, 3, 3), 60, 30),
-            DoubleConv((30, 3, 3), 30, 30),
-            DoubleConv((30, 3, 3), 30, 60)
+            DoubleConv((60, 3, 3), 60, 120),
+            DoubleConv((120, 3, 3), 120, 120),
+            DoubleConv((120, 3, 3), 120, 60)
         )
 
         # Second half
@@ -124,3 +124,13 @@ class UNetSmall(nn.Module):
         )
 
 
+def sinusoidal_embedding(n, d):
+    # Returns the standard positional embedding
+    embedding = torch.zeros(n, d)
+    wk = torch.tensor([1 / 10000 ** (j * 2 / d) for j in range(d//2)])
+
+    t = torch.arange(n).reshape((n, 1))
+    embedding[:, ::2] = torch.sin(t * wk)
+    embedding[:, 1::2] = torch.cos(t * wk)
+
+    return embedding

@@ -45,8 +45,10 @@ def generate_new_images(model=None, n_samples=16, device=None, frames_per_gif=10
     else:
         ddpm = model
     torch.cuda.empty_cache()
+    if n_steps is None:
+        n_steps = ddpm.n_steps
 
-    frame_idxs = np.linspace(0, ddpm.n_steps, frames_per_gif).astype(np.uint)
+    frame_idxs = np.linspace(0, n_steps, frames_per_gif).astype(np.uint)
     frames = []
 
     with torch.no_grad():
@@ -56,7 +58,7 @@ def generate_new_images(model=None, n_samples=16, device=None, frames_per_gif=10
         # Starting from random noise
         x = torch.randn(n_samples, c, h, w).to(device)
 
-        for idx, t in enumerate(tqdm(list(range(ddpm.n_steps))[::-1], leave=False, desc="Steps", colour="#005500")):
+        for idx, t in enumerate(tqdm(list(range(n_steps))[::-1], leave=False, desc="Steps", colour="#005500")):
             # Estimating noise to be removed
             time_tensor = (torch.ones(n_samples, 1) * t).to(device).long()
             eta_theta = ddpm.backward(x, time_tensor, n_steps)
