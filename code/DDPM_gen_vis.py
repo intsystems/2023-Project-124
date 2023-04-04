@@ -4,12 +4,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from tqdm.auto import tqdm
-import imageio
-import einops
 device = torch.device("cuda:0")
 
 
-def show_images(images, title=None):
+def show_images(images, save_path=None):
     """Shows the provided images as sub-pictures in a square"""
 
     # Converting images to CPU numpy arrays
@@ -18,6 +16,9 @@ def show_images(images, title=None):
 
     # Defining number of rows and columns
     fig = plt.figure(figsize=(8, 8))
+    plt.axis('off')
+    plt.rcParams['axes.grid'] = False
+
     rows = int(len(images) ** (1 / 2))
     cols = round(len(images) / rows)
 
@@ -25,39 +26,23 @@ def show_images(images, title=None):
     idx = 0
     for r in range(rows):
         for c in range(cols):
-            fig.add_subplot(rows, cols, idx + 1)
+            fig.add_subplot(rows, cols, idx + 1, xticks=[], yticks=[])
 
             if idx < len(images):
                 plt.imshow(images[idx][0], cmap="gray")
                 idx += 1
-    fig.suptitle(title, fontsize=30)
+
+    if save_path is not None:
+        plt.savefig(save_path, bbox_inches='tight')
 
     # Showing the figure
     plt.show()
 
 
-def generate_new_images(model=None, n_samples=16, device=None, frames_per_gif=100,
-                        gif_name="sampling.gif", c=1, h=28, w=28, n_steps=None, gif=False,
-                        from_unet=False):
-    """Given a DDPM model, a number of samples to be generated and a device, returns some newly generated samples"""
-    if from_unet:
-        ddpm = MyDDPM(model, n_steps, device="cuda:0")
-    else:
-        ddpm = model
-    torch.cuda.empty_cache()
-    if n_steps is None:
-        n_steps = ddpm.n_steps
-
-    frame_idxs = np.linspace(0, n_steps, frames_per_gif).astype(np.uint)
-    frames = []
-
+def generate_batch(ddpm, n_steps, n_samples, c, h, w):
+    device = ddpm.device
     with torch.no_grad():
-        if device is None:
-            device = ddpm.device
-
-        # Starting from random noise
         x = torch.randn(n_samples, c, h, w).to(device)
-
         for idx, t in enumerate(tqdm(list(range(n_steps))[::-1], leave=False, desc="Steps", colour="#005500")):
             # Estimating noise to be removed
             time_tensor = (torch.ones(n_samples, 1) * t).to(device).long()
@@ -78,32 +63,33 @@ def generate_new_images(model=None, n_samples=16, device=None, frames_per_gif=10
 
                 # Adding some more noise like in Langevin Dynamics fashion
                 x = x + sigma_t * z
+    return x
 
-            # Adding frames to the GIF
-            if gif:
-                if idx in frame_idxs or t == 0:
-                    # Putting digits in range [0, 255]
-                    normalized = x.clone()
-                    for i in range(len(normalized)):
-                        normalized[i] -= torch.min(normalized[i])
-                        normalized[i] *= 255 / torch.max(normalized[i])
 
-                    # Reshaping batch (n, c, h, w) to be a (as much as it gets) square frame
-                    frame = einops.rearrange(normalized, "(b1 b2) c h w -> (b1 h) (b2 w) c",
-                                                 b1=int(n_samples ** 0.5))
-                    frame = frame.cpu().numpy().astype(np.uint8)
+def generate_new_images(model=None, n_samples=16, device=None,
+                         c=1, h=28, w=28, n_steps=None,
+                        from_unet=False, nmax=3000):
+    if from_unet:
+        ddpm = MyDDPM(model, n_steps, device="cuda:0")
+    else:
+        ddpm = model
+    torch.cuda.empty_cache()
+    if n_steps is None:
+        n_steps = ddpm.n_steps
 
-                    # Rendering frame
-                    frames.append(frame)
-
-    # Storing the gif
-    if gif:
-        with imageio.get_writer(gif_name, mode="I") as writer:
-            for idx, frame in enumerate(frames):
-                writer.append_data(frame)
-                if idx == len(frames) - 1:
-                    for _ in range(frames_per_gif // 3):
-                        writer.append_data(frames[-1])
+    if n_samples <= nmax:
+        x = generate_batch(ddpm, n_steps, n_samples, c, h, w)
+    else:
+        k = n_samples // nmax
+        k += 1 if (n_samples % nmax != 0) else 0
+        xs = []
+        for i in tqdm(range(k), leave=False, desc="batches", colour="#000077"):
+            torch.cuda.empty_cache()
+            if i < k - 1 or (n_samples % nmax == 0):
+                xs.append(generate_batch(ddpm, n_steps, nmax, c, h, w))
+            else:
+                xs.append(generate_batch(ddpm, n_steps, n_samples%nmax, c, h, w))
+        x = torch.cat(xs, dim=0)
 
     try:
         del ddpm
@@ -165,3 +151,6 @@ def sinusoidal_embedding(n, d):
     embedding[:, 1::2] = torch.cos(t * wk)
 
     return embedding
+
+
+

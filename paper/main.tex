@@ -13,6 +13,11 @@
 \usepackage{natbib}
 \usepackage{doi}
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{subcaption}
+
+%\usepackage{subfigure}
 \DeclareMathOperator*{\argmax}{\arg\!\max}
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 
@@ -119,9 +124,13 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 
 \subsection{Альтернативные схемы тренировки}
 
+Vanilla GAN (JS-div) ?
+
+F-GAN ? 
+
 Wasserstien GAN ?
 
-Vanilla GAN (JS-div) ?
+
 
 
 
@@ -132,20 +141,72 @@ Vanilla GAN (JS-div) ?
 
 
 \subsection{Диффузионная модель}
-Для начала обучаем простую диффузионную модель аналогично \cite{https://doi.org/10.48550/arxiv.2006.11239} и измерим FID-score 
-В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net архитектуры. Для различного количества шагов T обратного диффузионного процесса считаем FID. Полученная зависимость изображена ниже.
+Для начала обучаем простую диффузионную модель аналогично \cite{https://doi.org/10.48550/arxiv.2006.11239} и измерим FID-score -- общепринятую метрику для оценки качества генеративных моделей.
 
+В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net архитектуры. Для различного количества шагов T от 10 до 1000 обратного диффузионного процесса считаем FID. 
 \newpage
 
 \begin{figure}[h]
 	\centering{\includegraphics[scale = 0.4]{../code/DDPM_FID_FMNIST.png}}
-	\caption{Зависимость FID от количества шагов}
+	\caption{Зависимость FID от количества шагов для DDPM}
 \end{figure}
 
-Несмотря на некоторые колебания, вызванные, вероятно, недостаточным числом тестовых семплов на каждой итерации, FID, как и ожидалось, падает с увеличением T.
+Как и ожидалось, качество семплов значительно повышается с ростом T, что видно на примерах ниже. 
+\begin{figure}[h!]
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDPM_50.png}
+		\caption{T = 50}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDPM_300.png}
+		\caption{T = 300}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDPM_1000.png}
+		\caption{T = 1000}
+	\end{subfigure}
+\caption{Семплы из DDPM для различных значений T}
+\end{figure}
 
 \subsection{DDGAN}
-Теперь заменим модель, используемую для диффузионного процесса на неявную модель. Для начала используем non-saturating GAN \cite{https://doi.org/10.48550/arxiv.1406.2661} как в оригинальной статье. Используем в качестве дискриминатора половину U-Net модели из базового эксперимента с линейным выходным слоем, в качестве генератора аналогичный U-Net с дополнительными слоями эмбеддинга для латентной переменной.
+Теперь заменим модель, используемую для диффузионного процесса на неявную модель. Для начала используем non-saturating GAN \cite{https://doi.org/10.48550/arxiv.1406.2661} как в оригинальной статье. Используем в качестве дискриминатора половину U-Net модели из базового эксперимента с дополнительным линейным выходным слоем, в качестве генератора аналогичный U-Net с дополнительными слоями эмбеддинга для латентной переменной. 
+
+Целью использования неявной модели является существенное уменьшение числа шагов обратного процесса, поэтому будем рассматривать различные T от 1 до 10. Для них посчитаем FID и рассмотрим сгенерированные моделью примеры.
+
+\begin{figure}[H]
+	\centering{\includegraphics[scale = 0.4]{../code/DDGAN_FID_FMNIST.png}}
+	\caption{Зависимость FID от количества шагов для DDGAN}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_3.png}
+		\caption{T = 3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_5.png}
+		\caption{T = 5}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_10.png}
+		\caption{T = 10}
+	\end{subfigure}
+	\caption{Семплы из DDGAN для различных значений T}
+	
+\end{figure}
+
+\subsection{Альтернативные GAN модели}
+
 Далее изменим постановку задачи минимизации, для соответствия другой схеме тренировки GAN модели
  -- (TO DO)
 

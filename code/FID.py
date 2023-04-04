@@ -8,14 +8,15 @@ import numpy as np
 import glob
 from torch.utils.data import Dataset
 from PIL import Image
+device = torch.device("cuda:0")
 
 
 # Define the generator for the Inception v3 model
 class InceptionV3(nn.Module):
-    def __init__(self, num_classes=100):
+    def __init__(self):
         super(InceptionV3, self).__init__()
         self.inception = torchvision.models.inception_v3(weights="Inception_V3_Weights.DEFAULT")
-        self.inception.fc = nn.Linear(self.inception.fc.in_features, num_classes)
+        self.inception.fc = nn.Identity()
 
     def forward(self, x):
         x = self.inception(x)
@@ -47,9 +48,9 @@ def calculate_fid(real_features, fake_features):
 
 
 # Define the function to extract features from the Inception v3 model
-def extract_features(loader, batch_size=50, num_classes=100):
+def extract_features(loader, batch_size=50, num_classes=2048):
     # Set up the Inception v3 model
-    model = InceptionV3(num_classes).cuda()
+    model = InceptionV3().to(device)
     model.eval()
 
     # Extract the features for the images
@@ -86,7 +87,7 @@ class TestDataset(Dataset):
         return img
 
 
-def FID_score(path_real, path_fake, real_saved=False, num_features=100):
+def FID_score(path_real, path_fake, real_saved=False, num_features=2048):
 
     # Define the transforms for the images
     transform = transforms.Compose([
