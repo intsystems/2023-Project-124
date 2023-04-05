@@ -120,7 +120,7 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
  \begin{equation}
 	p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t}) := \int p_\theta(\mathbf{x_0}|\mathbf{x_t})q(\mathbf{x_{t-1}}|\mathbf{x_t}, \mathbf{x_0})d\mathbf{x_0} =\int p(z)q(\mathbf{x_{t-1}}|\mathbf{x_t}, \mathbf{x_0} = G_\theta(\mathbf{x_t}, \mathbf{z}, t))d\mathbf{z}
 \end{equation}
-где $p_\theta(\mathbf{x_0}|\mathbf{x_t})$ -- неявное распределение порождаемое генератором $G_\theta(\mathbf{x_t}, \mathbf{z}, t):\mathbb{R}^N\times\mathbb{R}^L\mathbb{R}\to \mathbb{R}^N$, прогнозирующим $\mathbf{x_0}$ по $\mathbf{x_t}$ и свободной нормально распределенной переменной $\mathbf{z}\sim p(\mathbf{z}) := \mathcal{N}(\mathbf{z}; 0, I)$. Введение такой случайной переменной и позволяет восстанавливаемому распределению стать сложным мультимодальным.
+где $p_\theta(\mathbf{x_0}|\mathbf{x_t})$ -- неявное распределение порождаемое генератором $G_\theta(\mathbf{x_t}}, \mathbf{z}, t):\mathbb{R}^N\times\mathbb{R}^L\mathbb{R}\to \mathbb{R}^N$, прогнозирующим $\mathbf{x_0}$ по $\mathbf{x_t}$ и свободной нормально распределенной переменной $\mathbf{z}\sim p(\mathbf{z}) := \mathcal{N}(\mathbf{z}; 0, I)$. Введение такой случайной переменной и позволяет восстанавливаемому распределению стать сложным мультимодальным.
 
 \subsection{Альтернативные схемы тренировки}
 
