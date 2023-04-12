@@ -72,7 +72,7 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 
 Пусть $\mathbf{X} = (\mathbf{x_0^1}\dots \mathbf{x_0^n})\sim p_0(\mathbf{x})$ -- обучающая выборка, т.е. некоторые семплы из распределения, объекты которого модель должна научиться генерировать. $p(\mathbf{x_1}\dots \mathbf{x_T}) = p_\theta(\mathbf{x_T})p_\theta(\mathbf{x_{T-1}}|\mathbf{x_T})\dots p_\theta(\mathbf{x_0}|\mathbf{x_1})$ -- совместное распределение генерируемых на каждом шаге обратного процесса объектов, $\theta$ -- обучаемые параметры модели. Тогда для построения обратного процесса воспользуемся методом максимального правдоподобия:
  \begin{equation}
-	\theta =\argmax\limits_{\theta} p(\mathbf{X}|\theta) = \argmax\limits_{\theta} \sum\limits_{i=1}^n \log{p(\mathbf{x_0^i}|\theta)},
+	\theta^* =\argmax\limits_{\theta} p(\mathbf{X}|\theta) = \argmax\limits_{\theta} \sum\limits_{i=1}^n \log{p(\mathbf{x_0^i}|\theta)},
 \end{equation}
 
  \begin{equation}	
@@ -123,10 +123,44 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 где $p_\theta(\mathbf{x_0}|\mathbf{x_t})$ -- неявное распределение порождаемое генератором $G_\theta(\mathbf{x_t}, \mathbf{z}, t):\mathbb{R}^N\times\mathbb{R}^L\times\mathbb{R}\to \mathbb{R}^N$, прогнозирующим $\mathbf{x_0}$ по $\mathbf{x_t}$ и свободной нормально распределенной переменной $\mathbf{z}\sim p(\mathbf{z}) := \mathcal{N}(\mathbf{z}; 0, \mathbf{I})$. Введение такой случайной переменной и позволяет восстанавливаемому распределению стать сложным мультимодальным.
 
 \subsection{Альтернативные схемы тренировки}
+Оригинальная GAN модель, используемая в DDGAN тренируется на минимизацию JS-дивергенции между исходным и сгенерированным распределениями. JS-дивергенция входит в семейство f-дивергенций определяемых следующим образом:
+\begin{equation}
+	D_f(Q||P) = \int_\mathcal{X} p(\mathbf{x}) f\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right)d\mathbf{x},
+\end{equation}
+где $f$ -- выпуклая непрерывная слева функция, такая что $f(1) = 0$. Преобразования Фенхеля функции определяется как 
+\begin{equation}
+	f^* = \sup\limits_{u\in \text{dom}_f} (ut - f(u)).
+\end{equation}
+Из выпуклости функции и свойств такого преобразования следует:
+\begin{equation}
+	f^{**} = f = \sup\limits_{t\in \text{dom}_{f^*}} (ut - f^*(t)).
+\end{equation}
 
-Vanilla GAN (JS-div) ?
+Тогда произвольную f-дивергенцию можно оценить снизу (подробнее см. \cite{Nguyen_2010}):
 
-F-GAN ? 
+\begin{equation}
+	D_f(Q||P) = \int_\mathcal{X} p(\mathbf{x})  
+	\sup\limits_{t\in \text{dom}_{f^*}} \left( t\frac{q(\mathbf{x})}{p(\mathbf{x})}-f^*(t) \right) d\mathbf{x}
+	\geqslant
+\end{equation}
+\begin{equation}
+		\geqslant\sup\limits_{T \in \mathcal{T}}\left(\int _\mathcal{X}q(\mathbf{x})T(\mathbf{x})d\mathbf{x} -  \int _\mathcal{X}p(\mathbf{x})f^*(T(\mathbf{x}))d\mathbf{x} \right) = 
+\end{equation}
+\begin{equation}
+	= \sup\limits_{T \in \mathcal{T}}\left(\mathbb{E}_{\mathbf{x}\sim Q} [T(\mathbf{x})] - \mathbb{E}_{\mathbf{\mathbf{x}}\sim P} [f^*(T(\mathbf{x}))] \right),
+		\label{Dsup} 
+\end{equation}
+где $\mathcal{T}$ -- произвольный класс функций $T:\mathcal{X} \to \mathbb{R}$. Было показано \cite{Nguyen_2010}, что при заданных условиях на $f$ оценка достигается при 
+\begin{equation}
+	T^*(\mathbf{x}) = f'\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right)
+\end{equation}
+На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $P = P_\mathbf{\theta}$ и приближающую функцию из оценки \ref{Dsup} $T = T_\mathbf{\omega}$, $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид
+\begin{equation}
+F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{\mathbf{\mathbf{x}}\sim P_\mathbf{\theta}} [f^*(T_\mathbf{\omega}(\mathbf{x}))]
+\end{equation}
+Теперь получим частные случаи для различных f-дивергенций, чтобы далее экспериментально оценить влияние постановки минимизационной задачи для GAN на качество и скорость генерации в диффузионной модели.
+
+
 
 Wasserstien GAN ?
 
@@ -137,21 +171,26 @@ Wasserstien GAN ?
 
 
  \section{Вычислительный эксперимент}
-Целью эксперимента является анализ влияния количества шагов обратного диффузного процесса на качество и скорость семплирования для различных способов ускорения. В качестве метрики качества используем FID-score \cite{https://doi.org/10.48550/arxiv.1706.08500}, тестируем все рассматриваемые модели на датасете FashionMNIST. 
+Целью эксперимента является анализ влияния количества шагов обратного диффузного процесса на качество и скорость семплирования для различных способов ускорения. В качестве метрики качества используем FID-score \cite{https://doi.org/10.48550/arxiv.1706.08500}. Для двух многомерных нормальных распределений Fréchet inception distance определяется как:
+ \begin{equation}
+	FID({\mathcal {N}}(\mathbf{\mu},\mathbf{\Sigma}),{\mathcal {N}}(\mathbf{\mu} ',\mathbf{\Sigma} '))^{2}=\lVert \mathbf{\mu} -\mathbf{\mu} '\rVert _{2}^{2}+\mathbf{tr} \left(\mathbf{\Sigma} +\mathbf{\Sigma} '-2\left(\mathbf{\Sigma} ^{\frac {1}{2}}\cdot \mathbf{\Sigma} '\cdot \mathbf{\Sigma} ^{\frac {1}{2}}\right)^{\frac {1}{2}}\right).
+\end{equation}
+Для других распределений такая формула является ближайшим практически вычислимым приближением. В качестве сравниваемых распределений для вычисления метрики рассматривают распределения признаков информативных векторных представлений семплов, полученных с помощью предтренированной сверточной сети InceptionV3 \cite{szegedy2015rethinking}.
+
+ Тестируем все рассматриваемые модели на FashionMNIST \cite{xiao2017fashionmnist}.
 
 
 \subsection{Диффузионная модель}
-Для начала обучаем простую диффузионную модель аналогично \cite{https://doi.org/10.48550/arxiv.2006.11239} и измерим FID-score -- общепринятую метрику для оценки качества генеративных моделей.
+Для начала обучаем простую диффузионную модель аналогично \cite{https://doi.org/10.48550/arxiv.2006.11239} и измерим FID-score.
 
-В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net архитектуры. Для различного количества шагов T от 10 до 1000 обратного диффузионного процесса считаем FID. 
-\newpage
+В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net архитектуры. Для различного количества шагов T от 10 до 1000 обратного диффузионного процесса считаем метрику и строим график  FID(T) (рис. \ref{ddpm_fid}).
 
 \begin{figure}[h]
 	\centering{\includegraphics[scale = 0.4]{../code/DDPM_FID_FMNIST.png}}
-	\caption{Зависимость FID от количества шагов для DDPM}
+	\caption{Зависимость FID от количества шагов для DDPM}\label{ddpm_fid}
 \end{figure}
 
-Как и ожидалось, качество семплов значительно повышается с ростом T, что видно на примерах ниже. 
+Как и ожидалось, качество семплов ) значительно повышается с ростом T, что видно на примерах, см. рис. \ref{ddpm_samples}.
 \begin{figure}[h!]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
@@ -170,17 +209,17 @@ Wasserstien GAN ?
 		\includegraphics[scale=0.3]{../code/generated_DDPM_1000.png}
 		\caption{T = 1000}
 	\end{subfigure}
-\caption{Семплы из DDPM для различных значений T}
+\caption{Семплы из DDPM для различных значений T}\label{ddpm_samples}
 \end{figure}
 
 \subsection{DDGAN}
 Теперь заменим модель, используемую для диффузионного процесса на неявную модель. Для начала используем non-saturating GAN \cite{https://doi.org/10.48550/arxiv.1406.2661} как в оригинальной статье. Используем в качестве дискриминатора половину U-Net модели из базового эксперимента с дополнительным линейным выходным слоем, в качестве генератора аналогичный U-Net с дополнительными слоями эмбеддинга для латентной переменной. 
 
-Целью использования неявной модели является существенное уменьшение числа шагов обратного процесса, поэтому будем рассматривать различные T от 1 до 10. Для них посчитаем FID и рассмотрим сгенерированные моделью примеры.
+Целью использования неявной модели является существенное уменьшение числа шагов обратного процесса, поэтому будем рассматривать различные T от 1 до 10. Для них посчитаем FID, построим график (рис. \ref{ddgan_fid}) и рассмотрим сгенерированные моделью примеры. (рис. \ref{ddgan_samples})
 
-\begin{figure}[H]
+\begin{figure}[H]	
 	\centering{\includegraphics[scale = 0.4]{../code/DDGAN_FID_FMNIST.png}}
-	\caption{Зависимость FID от количества шагов для DDGAN}
+	\caption{Зависимость FID от количества шагов для DDGAN}\label{ddgan_fid}
 \end{figure}
 
 \begin{figure}[H]
@@ -201,8 +240,7 @@ Wasserstien GAN ?
 		\includegraphics[scale=0.3]{../code/generated_DDGAN_10.png}
 		\caption{T = 10}
 	\end{subfigure}
-	\caption{Семплы из DDGAN для различных значений T}
-	
+	\caption{Семплы из DDGAN для различных значений T}\label{ddgan_samples}	
 \end{figure}
 
 \subsection{Альтернативные GAN модели}
@@ -213,10 +251,8 @@ Wasserstien GAN ?
 
 
 
+
 \bibliographystyle{plain}
 \bibliography{references}
-
-
-
 
 \end{document}

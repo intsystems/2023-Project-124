@@ -37,6 +37,13 @@ Diederik~P Kingma and Max Welling.
 Zhifeng Kong and Wei Ping.
 \newblock On fast sampling of diffusion probabilistic models, 2021.
 
+\bibitem{Nguyen_2010}
+XuanLong Nguyen, Martin~J. Wainwright, and Michael~I. Jordan.
+\newblock Estimating divergence functionals and the likelihood ratio by convex
+  risk minimization.
+\newblock {\em {IEEE} Transactions on Information Theory}, 56(11):5847--5861,
+  nov 2010.
+
 \bibitem{https://doi.org/10.48550/arxiv.2102.09672}
 Alex Nichol and Prafulla Dhariwal.
 \newblock Improved denoising diffusion probabilistic models, 2021.
@@ -54,6 +61,16 @@ Matt Shannon, Ben Poole, Soroosh Mariooryad, Tom Bagby, Eric Battenberg, David
 \bibitem{https://doi.org/10.48550/arxiv.1503.03585}
 Jascha Sohl-Dickstein, Eric~A. Weiss, Niru Maheswaranathan, and Surya Ganguli.
 \newblock Deep unsupervised learning using nonequilibrium thermodynamics, 2015.
+
+\bibitem{szegedy2015rethinking}
+Christian Szegedy, Vincent Vanhoucke, Sergey Ioffe, Jonathon Shlens, and
+  Zbigniew Wojna.
+\newblock Rethinking the inception architecture for computer vision, 2015.
+
+\bibitem{xiao2017fashionmnist}
+Han Xiao, Kashif Rasul, and Roland Vollgraf.
+\newblock Fashion-mnist: a novel image dataset for benchmarking machine
+  learning algorithms, 2017.
 
 \bibitem{https://doi.org/10.48550/arxiv.2112.07804}
 Zhisheng Xiao, Karsten Kreis, and Arash Vahdat.
