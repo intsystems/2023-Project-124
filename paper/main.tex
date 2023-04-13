@@ -114,7 +114,7 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 
 С известным дискриминатором тренируем генератор на максимизацию:
  \begin{equation}
-	\max\limits_\theta\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[\log{(D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}].
+	\max\limits_\theta\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}\mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[\log{(D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}].
 \end{equation}
 Причем параметризуем целевое распределение следующим образом:
  \begin{equation}
@@ -127,7 +127,7 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 \begin{equation}
 	D_f(Q||P) = \int_\mathcal{X} p(\mathbf{x}) f\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right)d\mathbf{x},
 \end{equation}
-где $f$ -- выпуклая непрерывная слева функция, такая что $f(1) = 0$. Преобразования Фенхеля функции определяется как 
+где $f$ -- выпуклая непрерывная слева функция, такая что $f(1) = 0$, называемая порождающей. Преобразование Фенхеля функции определяется как 
 \begin{equation}
 	f^* = \sup\limits_{u\in \text{dom}_f} (ut - f(u)).
 \end{equation}
@@ -154,13 +154,50 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 \begin{equation}
 	T^*(\mathbf{x}) = f'\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right)
 \end{equation}
-На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $P = P_\mathbf{\theta}$ и приближающую функцию из оценки \ref{Dsup} $T = T_\mathbf{\omega}$, $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид
+На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $P = P_\mathbf{\theta}$ и приближающую функцию из оценки \ref{Dsup} $T = T_\mathbf{\omega}$, где $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид
 \begin{equation}
-F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{\mathbf{\mathbf{x}}\sim P_\mathbf{\theta}} [f^*(T_\mathbf{\omega}(\mathbf{x}))]
+F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{ \mathbf{\mathbf{x}}\sim P_\mathbf{\theta}}[f^*(T_\mathbf{\omega}(\mathbf{x}))]
 \end{equation}
 Теперь получим частные случаи для различных f-дивергенций, чтобы далее экспериментально оценить влияние постановки минимизационной задачи для GAN на качество и скорость генерации в диффузионной модели.
+Для этого рассмотрим $T_\mathbf{\omega} = g_f(V_\mathbf{\omega})$, где $V_\omega : \mathcal{X} \to \mathbb{R}$, а $g_f: \mathbb{R} \to \text{dom}_{f^*}$ -- функция активации, подходящая для выбранной дивергенции.
 
+Рассмотрим квадрат расстояния Хелингера 
+\begin{equation}
+	\text{H}^2(Q|P) - \frac{1}{2}\int_\mathcal{X} \left(\sqrt{q(\mathbf{x})} - \sqrt{p(\mathbf{x})}\right)^2d\mathbf(x).
+\end{equation}
+Порождающая функция и ее сопряженная:
+\begin{equation}
+	f_{H^2}(u) = (\sqrt{u} - 1)^2, ~~~~~ f^*_{H^2}(t) = \frac{t}{1 - t}.
+\end{equation}
+$T$ параметризуем через выход дискриминатора $D_{H^2}(x) = \dfrac{1}{1-\exp(-V)}$, взяв функцию активации:
+\begin{equation}
+	g_{f_{H^2}} = 1 - \exp(V) = \frac{1}{1 - D(x)}.
+\end{equation}
+Итого получаем следующую оптимизационную задачу в терминах, введенных для диффузионной модели:
+ \begin{equation}
+	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[\frac{1}{1 - (D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t) ) }] + \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[\frac{1}{D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}]].
+\end{equation}\\
 
+TO DO: ФУКНЦИИ ДЛЯ ДИСКРИМИНАТОРА И ГЕНЕРАТОРА \\
+
+В качестве другого частного случая, рассмотрим обратную KL-дивергенцию:
+ \begin{equation}
+	\text{Reverse-KL}(Q||P) = \text{KL}(P||Q) = \int\limits_\mathcal{X} p(\mathbf{x})\log{\frac{p(\mathbf{x})}{q(\mathbf{x})}}d\mathbf{x}
+\end{equation}
+Порождающая функция и ее сопряженная:
+\begin{equation}
+	f_{R-KL}(u) = -\log{u}, ~~~~~ f^*_{R-KL}(t) = -1- \log({-t}).
+\end{equation}
+$T$ параметризуем таким же образом со следующей функцией активации:
+\begin{equation}
+	g_{f_{R-KL}} = - \exp(V) = \frac{D(x)}{1 - D(x)}.
+\end{equation}
+Минимизационная задача для диффузионной модели с исопльзованием минимизации обратной KL-дивергенции:
+\begin{equation}
+	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[\frac{D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}{1 - D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}] + \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[\log{\left(-\frac{D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}{1 - D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}\right)}]].
+\end{equation}\\
+
+TO DO: ФУКНЦИИ ДЛЯ ДИСКРИМИНАТОРА И ГЕНЕРАТОРА \\
 
 Wasserstien GAN ?
 
@@ -175,7 +212,7 @@ Wasserstien GAN ?
  \begin{equation}
 	FID({\mathcal {N}}(\mathbf{\mu},\mathbf{\Sigma}),{\mathcal {N}}(\mathbf{\mu} ',\mathbf{\Sigma} '))^{2}=\lVert \mathbf{\mu} -\mathbf{\mu} '\rVert _{2}^{2}+\mathbf{tr} \left(\mathbf{\Sigma} +\mathbf{\Sigma} '-2\left(\mathbf{\Sigma} ^{\frac {1}{2}}\cdot \mathbf{\Sigma} '\cdot \mathbf{\Sigma} ^{\frac {1}{2}}\right)^{\frac {1}{2}}\right).
 \end{equation}
-Для других распределений такая формула является ближайшим практически вычислимым приближением. В качестве сравниваемых распределений для вычисления метрики рассматривают распределения признаков информативных векторных представлений семплов, полученных с помощью предтренированной сверточной сети InceptionV3 \cite{szegedy2015rethinking}.
+Для других распределений такая формула является ближайшим практически вычислимым приближением. В качестве сравниваемых распределений для вычисления метрики рассматривают распределения признаков информативных векторных представлений семплов, полученных с помощью предобученной сверточной сети InceptionV3 \cite{szegedy2015rethinking}.
 
  Тестируем все рассматриваемые модели на FashionMNIST \cite{xiao2017fashionmnist}.
 
