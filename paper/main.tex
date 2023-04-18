@@ -123,7 +123,7 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 где $p_\theta(\mathbf{x_0}|\mathbf{x_t})$ -- неявное распределение порождаемое генератором $G_\theta(\mathbf{x_t}, \mathbf{z}, t):\mathbb{R}^N\times\mathbb{R}^L\times\mathbb{R}\to \mathbb{R}^N$, прогнозирующим $\mathbf{x_0}$ по $\mathbf{x_t}$ и свободной нормально распределенной переменной $\mathbf{z}\sim p(\mathbf{z}) := \mathcal{N}(\mathbf{z}; 0, \mathbf{I})$. Введение такой случайной переменной и позволяет восстанавливаемому распределению стать сложным мультимодальным.
 
 \subsection{Альтернативные схемы тренировки}
-Оригинальная GAN модель, используемая в DDGAN тренируется на минимизацию JS-дивергенции между исходным и сгенерированным распределениями. JS-дивергенция входит в семейство f-дивергенций определяемых следующим образом:
+Оригинальная GAN модель, используемая в DDGAN тренируется на минимизацию JS-дивергенции между исходным и сгенерированным распределениями. JS-дивергенция входит в семейство f-дивергенций \cite{1705001} определяемых следующим образом:
 \begin{equation}
 	D_f(Q||P) = \int_\mathcal{X} p(\mathbf{x}) f\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right)d\mathbf{x},
 \end{equation}
@@ -152,58 +152,58 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 \end{equation}
 где $\mathcal{T}$ -- произвольный класс функций $T:\mathcal{X} \to \mathbb{R}$. Было показано \cite{Nguyen_2010}, что при заданных условиях на $f$ оценка достигается при 
 \begin{equation}
-	T^*(\mathbf{x}) = f'\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right)
+	T^*(\mathbf{x}) = f'\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right).
 \end{equation}
-На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $P = P_\mathbf{\theta}$ и приближающую функцию из оценки \ref{Dsup} $T = T_\mathbf{\omega}$, где $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид
-\begin{equation}
-F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{ \mathbf{\mathbf{x}}\sim P_\mathbf{\theta}}[f^*(T_\mathbf{\omega}(\mathbf{x}))]
-\end{equation}
-Теперь получим частные случаи для различных f-дивергенций, чтобы далее экспериментально оценить влияние постановки минимизационной задачи для GAN на качество и скорость генерации в диффузионной модели.
-Для этого рассмотрим $T_\mathbf{\omega} = g_f(V_\mathbf{\omega})$, где $V_\omega : \mathcal{X} \to \mathbb{R}$, а $g_f: \mathbb{R} \to \text{dom}_{f^*}$ -- функция активации, подходящая для выбранной дивергенции.
 
-Рассмотрим квадрат расстояния Хелингера 
+На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $P = P_\mathbf{\theta}$ и приближающую функцию из оценки \ref{Dsup} $T = T_\mathbf{\omega}$, где $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид:
 \begin{equation}
-	\text{H}^2(Q|P) - \frac{1}{2}\int_\mathcal{X} \left(\sqrt{q(\mathbf{x})} - \sqrt{p(\mathbf{x})}\right)^2d\mathbf(x).
+F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{ \mathbf{\mathbf{x}}\sim P_\mathbf{\theta}}[f^*(T_\mathbf{\omega}(\mathbf{x}))].
 \end{equation}
-Порождающая функция и ее сопряженная:
+
+Теперь получим частные случаи для различных f-дивергенций, чтобы далее экспериментально оценить влияние постановки минимизационной задачи для GAN на качество и скорость генерации в диффузионной модели.
+Для этого рассмотрим $T_\mathbf{\omega} = g_f(V_\mathbf{\omega})$, где $V_\omega : \mathcal{X} \to \mathbb{R}$ -- функция, моделируемая дискриминативной моделью, которая в классическом GAN называется дискриминатором, здесь же подобное название не опрпавдано, как и вероятностная интерепретация. $g_f: \mathbb{R} \to \text{dom}_{f^*}$ -- функция активации, подходящая для выбранной дивергенции.
+
+\subsubsection{Квадрат рассояния Хелингера}
 \begin{equation}
-	f_{H^2}(u) = (\sqrt{u} - 1)^2, ~~~~~ f^*_{H^2}(t) = \frac{t}{1 - t}.
+	\text{H}^2(Q||P) - \frac{1}{2}\int_\mathcal{X} \left(\sqrt{q(\mathbf{x})} - \sqrt{p(\mathbf{x})}\right)^2d\mathbf(x).
 \end{equation}
-$T$ параметризуем через выход дискриминатора $D_{H^2}(x) = \dfrac{1}{1-\exp(-V)}$, взяв функцию активации:
+
+Порождающая функция, ее сопряженная и функция активации:
 \begin{equation}
-	g_{f_{H^2}} = 1 - \exp(V) = \frac{1}{1 - D(x)}.
+	f_{H^2}(u) = (\sqrt{u} - 1)^2, ~~~~~ f^*_{H^2}(t) = \frac{t}{1 - t}, ~~~~~ g_{f_{H^2}}(V) = 1 - \exp(V).
 \end{equation}
-Итого получаем следующую оптимизационную задачу в терминах, введенных для диффузионной модели:
+
+Откуда оптимизационная задача в терминах, введенных для диффузионной модели:
  \begin{equation}
-	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[\frac{1}{1 - (D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t) ) }] + \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[\frac{1}{D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}]].
+	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}\left[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[1 - \exp{(V_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}] - \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[\exp{(-V_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}]\right].
 \end{equation}\\
 
-TO DO: ФУКНЦИИ ДЛЯ ДИСКРИМИНАТОРА И ГЕНЕРАТОРА \\
-
-В качестве другого частного случая, рассмотрим обратную KL-дивергенцию:
+\subsubsection{Обратная KL-дивергенция}
  \begin{equation}
 	\text{Reverse-KL}(Q||P) = \text{KL}(P||Q) = \int\limits_\mathcal{X} p(\mathbf{x})\log{\frac{p(\mathbf{x})}{q(\mathbf{x})}}d\mathbf{x}
 \end{equation}
-Порождающая функция и ее сопряженная:
+Порождающая функция, ее сопряженная и функция активации:
 \begin{equation}
-	f_{R-KL}(u) = -\log{u}, ~~~~~ f^*_{R-KL}(t) = -1- \log({-t}).
+	f_{R-KL}(u) = -\log{u}, ~~~~~ f^*_{R-KL}(t) = -1- \log({-t}),~~~~~ g_{f_{R-KL}}(V) = - \exp(V).
 \end{equation}
-$T$ параметризуем таким же образом со следующей функцией активации:
+
+Минимизационная задача:
 \begin{equation}
-	g_{f_{R-KL}} = - \exp(V) = \frac{D(x)}{1 - D(x)}.
-\end{equation}
-Минимизационная задача для диффузионной модели с исопльзованием минимизации обратной KL-дивергенции:
-\begin{equation}
-	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[\frac{D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}{1 - D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}] + \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[\log{\left(-\frac{D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}{1 - D_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)}\right)}]].
+	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}\left[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}[-\exp{(V_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}] + \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}[1 + V_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)]\right].
 \end{equation}\\
 
-TO DO: ФУКНЦИИ ДЛЯ ДИСКРИМИНАТОРА И ГЕНЕРАТОРА \\
-
-Wasserstien GAN ?
-
-
-
-
+\subsubsection{Total variation distance}
+\begin{equation}
+	\delta (Q||P) = \sup\limits_x|Q(x) - P(x)|.
+\end{equation}
+Порождающая функция, ее сопряженная и функция активации:
+\begin{equation}
+	f_{\delta}(u) = \frac{1}{2}|u-1|, ~~~~~ f^*_{\delta}(t) = t, ~~~~~ g_{f_{\delta}}(V) = \frac{1}{2}\tanh{(v)}
+\end{equation}
+Минимизационная задача:
+\begin{equation}
+	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}\left[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}\left[\frac{1}{2}\tanh{(V_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}\right] - \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}\left[\frac{1}{2}\tanh{(V_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t))}\right]\right].
+\end{equation}\\
 
 
 
@@ -214,7 +214,7 @@ Wasserstien GAN ?
 \end{equation}
 Для других распределений такая формула является ближайшим практически вычислимым приближением. В качестве сравниваемых распределений для вычисления метрики рассматривают распределения признаков информативных векторных представлений семплов, полученных с помощью предобученной сверточной сети InceptionV3 \cite{szegedy2015rethinking}.
 
- Тестируем все рассматриваемые модели на FashionMNIST \cite{xiao2017fashionmnist}.
+ Обучаем и тестируем все рассматриваемые модели на FashionMNIST \cite{xiao2017fashionmnist} (60000 картинок размером $28\times 28$).
 
 
 \subsection{Диффузионная модель}
@@ -222,13 +222,14 @@ Wasserstien GAN ?
 
 В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net архитектуры. Для различного количества шагов T от 10 до 1000 обратного диффузионного процесса считаем метрику и строим график  FID(T) (рис. \ref{ddpm_fid}).
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering{\includegraphics[scale = 0.4]{../code/DDPM_FID_FMNIST.png}}
 	\caption{Зависимость FID от количества шагов для DDPM}\label{ddpm_fid}
 \end{figure}
 
 Как и ожидалось, качество семплов ) значительно повышается с ростом T, что видно на примерах, см. рис. \ref{ddpm_samples}.
-\begin{figure}[h!]
+
+\begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
 		\includegraphics[scale=0.3]{../code/generated_DDPM_50.png}
@@ -282,10 +283,77 @@ Wasserstien GAN ?
 
 \subsection{Альтернативные GAN модели}
 
-Далее изменим постановку задачи минимизации, для соответствия другой схеме тренировки GAN модели
- -- (TO DO)
+Далее изменим постановку задачи минимизации, для соответствия другим схемам тренировки GAN моделей. 
 
+Используем как и раньше 2 сверточных сети, тренируемых параллельно, изменяем лишь функции потерь для соответствия схеме минимизации определенной дивергенции, все также рассматриваем число шагов T от 1 до 10. Для трех получившихся моделей построим графики зависимости FID-score от T (рис. \ref{ddgan_all_fid}) и приведем примеры семплов (рис. \ref{ddgan_h2_samples}, \ref{ddgan_rkl_samples}, \ref{ddgan_tv_samples}).
 
+\begin{figure}[H]	
+	\centering{\includegraphics[scale = 0.4]{../code/DDGAN_ALL_FID_FMNIST.png}}
+	\caption{Зависимость FID от количества шагов для различных GAN моделей в диффузионной сети}\label{ddgan_all_fid}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_h2_3.png}
+		\caption{T = 3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_h2_5.png}
+		\caption{T = 5}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_h2_10.png}
+		\caption{T = 10}
+	\end{subfigure}
+	\caption{Семплы из DDGAN c $H^2$}\label{ddgan_h2_samples}	
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_rkl_3.png}
+		\caption{T = 3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_rkl_5.png}
+		\caption{T = 5}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_rkl_10.png}
+		\caption{T = 10}
+	\end{subfigure}
+	\caption{Семплы из DDGAN c reversed-KL}\label{ddgan_rkl_samples}	
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_tv_3.png}
+		\caption{T = 3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_tv_5.png}
+		\caption{T = 5}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.3\linewidth}
+		\centering
+		\includegraphics[scale=0.3]{../code/generated_DDGAN_tv_10.png}
+		\caption{T = 10}
+	\end{subfigure}
+	\caption{Семплы из DDGAN c total variation}\label{ddgan_tv_samples}	
+\end{figure}
 
 
 

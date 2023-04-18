@@ -125,4 +125,5 @@ code/datasets/
 *.pt
 code/generated_ddpm_FMNIST/
 code/generated_ddgan_FMNIST/
+code/generated_*/
 code/*.npy
