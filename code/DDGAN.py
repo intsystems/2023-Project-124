@@ -163,9 +163,11 @@ def generate_batch(ddgan, n_steps, n_samples, c, h, w):
 
 
 def generate_new_images(model=None, n_samples=16, device=None,
-                        c=1, h=28, w=28, n_steps=None, nmax=3000):
+                        c=1, h=28, w=28, n_steps=None, nmax=2000):
     ddgan = model
     torch.cuda.empty_cache()
+    ddgan.eval()
+
     if device == None:
         device = ddgan.device
 
@@ -218,7 +220,12 @@ def show_images(images, save_path=None):
             fig.add_subplot(rows, cols, idx + 1, xticks=[], yticks=[])
 
             if idx < len(images):
-                plt.imshow(images[idx][0], cmap="gray")
+
+                img = images[idx][0]
+                img -= img.min()
+                img /= img.max()
+
+                plt.imshow(img, cmap="gray")
                 idx += 1
 
     if save_path is not None:

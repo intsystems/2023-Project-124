@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,7 +28,10 @@ def show_images(images, save_path=None):
             fig.add_subplot(rows, cols, idx + 1, xticks=[], yticks=[])
 
             if idx < len(images):
-                plt.imshow(images[idx][0], cmap="gray")
+                img = images[idx][0]
+                img -= img.min()
+                img /= img.max()
+                plt.imshow(img, cmap="gray")
                 idx += 1
 
     if save_path is not None:
@@ -57,7 +59,6 @@ def generate_batch(ddpm, n_steps, n_samples, c, h, w):
             if t > 0:
                 z = torch.randn(n_samples, c, h, w).to(device)
 
-                # Option 1: sigma_t squared = beta_t
                 beta_t = ddpm.betas[t]
                 sigma_t = beta_t.sqrt()
 
@@ -73,6 +74,9 @@ def generate_new_images(model=None, n_samples=16, device=None,
         ddpm = MyDDPM(model, n_steps, device="cuda:0")
     else:
         ddpm = model
+
+    ddpm.eval()
+
     torch.cuda.empty_cache()
     if n_steps is None:
         n_steps = ddpm.n_steps
@@ -88,7 +92,7 @@ def generate_new_images(model=None, n_samples=16, device=None,
             if i < k - 1 or (n_samples % nmax == 0):
                 xs.append(generate_batch(ddpm, n_steps, nmax, c, h, w))
             else:
-                xs.append(generate_batch(ddpm, n_steps, n_samples%nmax, c, h, w))
+                xs.append(generate_batch(ddpm, n_steps, n_samples % nmax, c, h, w))
         x = torch.cat(xs, dim=0)
 
     try:

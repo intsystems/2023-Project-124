@@ -13,6 +13,12 @@ Ian~J. Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David
   Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
 \newblock Generative adversarial networks, 2014.
 
+\bibitem{DBLP:journals/corr/GulrajaniAADC17}
+Ishaan Gulrajani, Faruk Ahmed, Mart{\'{\i}}n Arjovsky, Vincent Dumoulin, and
+  Aaron~C. Courville.
+\newblock Improved training of wasserstein gans.
+\newblock {\em CoRR}, abs/1704.00028, 2017.
+
 \bibitem{https://doi.org/10.48550/arxiv.1706.08500}
 Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp
   Hochreiter.

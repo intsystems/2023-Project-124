@@ -5,45 +5,45 @@ The style file: plain.bst
 Database file #1: references.bib
 Warning--I didn't find a database entry for "1705001"
 Warning--empty journal in https://doi.org/10.48550/arxiv.1706.08500
-You've used 16 entries,
+You've used 17 entries,
             2118 wiz_defined-function locations,
-            562 strings with 6726 characters,
-and the built_in function-call counts, 4715 in all, are:
-= -- 393
-> -- 343
+            568 strings with 6952 characters,
+and the built_in function-call counts, 5052 in all, are:
+= -- 423
+> -- 371
 < -- 0
-+ -- 135
-- -- 118
-* -- 304
-:= -- 806
-add.period$ -- 34
-call.type$ -- 16
-change.case$ -- 107
++ -- 146
+- -- 128
+* -- 330
+:= -- 870
+add.period$ -- 37
+call.type$ -- 17
+change.case$ -- 115
 chr.to.int$ -- 0
-cite$ -- 17
-duplicate$ -- 119
-empty$ -- 355
-format.name$ -- 118
-if$ -- 955
+cite$ -- 18
+duplicate$ -- 129
+empty$ -- 372
+format.name$ -- 128
+if$ -- 1019
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 2
-newline$ -- 69
-num.names$ -- 32
-pop$ -- 177
+int.to.str$ -- 17
+missing$ -- 3
+newline$ -- 74
+num.names$ -- 34
+pop$ -- 183
 preamble$ -- 1
-purify$ -- 91
+purify$ -- 98
 quote$ -- 0
-skip$ -- 129
+skip$ -- 137
 stack$ -- 0
-substring$ -- 112
-swap$ -- 15
+substring$ -- 117
+swap$ -- 16
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 64
+type$ -- 68
 warning$ -- 1
-while$ -- 34
-width$ -- 18
-write$ -- 134
+while$ -- 36
+width$ -- 19
+write$ -- 145
 (There were 2 warnings)
