@@ -43,6 +43,12 @@ Diederik~P Kingma and Max Welling.
 Zhifeng Kong and Wei Ping.
 \newblock On fast sampling of diffusion probabilistic models, 2021.
 
+\bibitem{1705001}
+F.~Liese and I.~Vajda.
+\newblock On divergences and informations in statistics and information theory.
+\newblock {\em IEEE Transactions on Information Theory}, 52(10):4394--4412,
+  2006.
+
 \bibitem{Nguyen_2010}
 XuanLong Nguyen, Martin~J. Wainwright, and Michael~I. Jordan.
 \newblock Estimating divergence functionals and the likelihood ratio by convex

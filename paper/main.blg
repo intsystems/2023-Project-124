@@ -3,47 +3,46 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 The style file: plain.bst
 Database file #1: references.bib
-Warning--I didn't find a database entry for "1705001"
 Warning--empty journal in https://doi.org/10.48550/arxiv.1706.08500
-You've used 17 entries,
+You've used 18 entries,
             2118 wiz_defined-function locations,
-            568 strings with 6952 characters,
-and the built_in function-call counts, 5052 in all, are:
-= -- 423
-> -- 371
+            575 strings with 7099 characters,
+and the built_in function-call counts, 5393 in all, are:
+= -- 457
+> -- 384
 < -- 0
-+ -- 146
-- -- 128
-* -- 330
-:= -- 870
-add.period$ -- 37
-call.type$ -- 17
-change.case$ -- 115
++ -- 151
+- -- 132
+* -- 357
+:= -- 926
+add.period$ -- 40
+call.type$ -- 18
+change.case$ -- 120
 chr.to.int$ -- 0
-cite$ -- 18
-duplicate$ -- 129
-empty$ -- 372
-format.name$ -- 128
-if$ -- 1019
+cite$ -- 19
+duplicate$ -- 140
+empty$ -- 401
+format.name$ -- 132
+if$ -- 1091
 int.to.chr$ -- 0
-int.to.str$ -- 17
-missing$ -- 3
-newline$ -- 74
-num.names$ -- 34
-pop$ -- 183
+int.to.str$ -- 18
+missing$ -- 4
+newline$ -- 79
+num.names$ -- 36
+pop$ -- 186
 preamble$ -- 1
-purify$ -- 98
+purify$ -- 102
 quote$ -- 0
-skip$ -- 137
+skip$ -- 145
 stack$ -- 0
-substring$ -- 117
-swap$ -- 16
+substring$ -- 149
+swap$ -- 17
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 68
+type$ -- 72
 warning$ -- 1
-while$ -- 36
-width$ -- 19
-write$ -- 145
-(There were 2 warnings)
+while$ -- 39
+width$ -- 20
+write$ -- 156
+(There was 1 warning)
