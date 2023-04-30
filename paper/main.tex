@@ -155,13 +155,14 @@ pdfauthor={Охотников Н.В., Исаченко Р.В.},
 	T^*(\mathbf{x}) = f'\left(\frac{q(\mathbf{x})}{p(\mathbf{x})}\right).
 \end{equation}
 
-На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $P = P_\mathbf{\theta}$ и приближающую функцию из оценки \ref{Dsup} $T = T_\mathbf{\omega}$, где $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид:
+На основании этой оценки можно построить обучения генеративной сети параметризовав две модели -- генеративную $G = G_\mathbf{\theta}$ и дискриминативную, приближающую функцию $T = T_\mathbf{\omega}$ из оценки \ref{Dsup}, где $\mathbf{\omega}, \mathbf{\theta}$ -- векторы обучаемых параметров. В таком случае целевая функция приобретает вид:
 \begin{equation}
-F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{ \mathbf{\mathbf{x}}\sim P_\mathbf{\theta}}[f^*(T_\mathbf{\omega}(\mathbf{x}))].
+F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})] - \mathbb{E}_{ \mathbf{\mathbf{x}}\sim P_\mathbf{\theta}}[f^*(T_\mathbf{\omega}(\mathbf{x}))],
 \end{equation}
+где распределение $p_\theta$ моделируется генеративной моделью.
 
 Теперь получим частные случаи для различных f-дивергенций, чтобы далее экспериментально оценить влияние постановки минимизационной задачи для GAN на качество и скорость генерации в диффузионной модели.
-Для этого рассмотрим $T_\mathbf{\omega} = g_f(V_\mathbf{\omega})$, где $V_\omega : \mathcal{X} \to \mathbb{R}$ -- функция, моделируемая дискриминативной моделью, которая в классическом GAN называется дискриминатором, здесь же подобное название не опрпавдано, как и вероятностная интерепретация. $g_f: \mathbb{R} \to \text{dom}_{f^*}$ -- функция активации, подходящая для выбранной дивергенции.
+Для этого рассмотрим $T_\mathbf{\omega} = g_f(V_\mathbf{\omega})$, где $V_\omega : \mathcal{X} \to \mathbb{R}$ -- функция, моделируемая дискриминативной моделью, которая в классическом GAN называется дискриминатором, здесь же подобное название не оправдано, как и вероятностная интерепретация. $g_f: \mathbb{R} \to \text{dom}_{f^*}$ -- функция активации, подходящая для выбранной дивергенции.
 
 \subsubsection{Квадрат рассояния Хелингера}
 \begin{equation}
@@ -180,7 +181,7 @@ F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})
 
 \subsubsection{Обратная KL-дивергенция}
  \begin{equation}
-	\text{Reverse-KL}(Q||P) = \text{KL}(P||Q) = \int\limits_\mathcal{X} p(\mathbf{x})\log{\frac{p(\mathbf{x})}{q(\mathbf{x})}}d\mathbf{x}
+	\text{Reverse-KL}(Q||P) = \text{KL}(P||Q) = \int\limits_\mathcal{X} p(\mathbf{x})\log{\frac{p(\mathbf{x})}{q(\mathbf{x})}}d\mathbf{x}.
 \end{equation}
 Порождающая функция, ее сопряженная и функция активации:
 \begin{equation}
@@ -198,7 +199,7 @@ F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})
 \end{equation}
 Порождающая функция, ее сопряженная и функция активации:
 \begin{equation}
-	f_{\delta}(u) = \frac{1}{2}|u-1|, ~~~~~ f^*_{\delta}(t) = t, ~~~~~ g_{f_{\delta}}(V) = \frac{1}{2}\tanh{(v)}
+	f_{\delta}(u) = \frac{1}{2}|u-1|, ~~~~~ f^*_{\delta}(t) = t, ~~~~~ g_{f_{\delta}}(V) = \frac{1}{2}\tanh{(v)}.
 \end{equation}
 Минимизационная задача:
 \begin{equation}
@@ -208,24 +209,24 @@ F(\theta, \omega) = \mathbb{E}_{\mathbf{x}\sim Q} [T_\mathbf{\omega}(\mathbf{x})
 \subsubsection{Wasserstein distance}
 F-дивергенции -- не единственный класс функций близости распределений, использующихся в генеративном моделировании. Отдельно рассмотрим другую популярную метрику -- wasserstein distance \cite{https://doi.org/10.48550/arxiv.1701.07875, DBLP:journals/corr/GulrajaniAADC17}:
 \begin{equation}
-	\text{W}(Q||P) = \inf\limits_{\gamma \in \Gamma(Q,P)} \mathbb{E}_{(x,y)\sim \gamma} \|x-y\|,
+	\text{W}(Q||P) = \inf\limits_{\gamma \in \Gamma(Q,P)} \mathbb{E}_{(\mathbf{x},\mathbf{y})\sim \gamma} \|\mathbf{x}-\mathbf{y}\|,
 \end{equation}
-Где $\Gamma$ -- множество всех совместных распределений  $\gamma(x,y)$ таких, что $\int \gamma(x,y) dx = P(y),~\int \gamma(x,y) dy = Q(x)$. Пользуясь, как в оригинальной статье, двойственостью Канторовича-Рубинштейна получаем:
+Где $\Gamma$ -- множество всех совместных распределений  $\gamma(\mathbf{x},\mathbf{y})$ таких, что $\int \gamma(\mathbf{x},\mathbf{y}) dx = P(y),~\int \gamma(\mathbf{x},\mathbf{y}) d\mathbf{y} = Q(\mathbf{x})$. Пользуясь, как в оригинальной статье, двойственостью Канторовича-Рубинштейна получаем:
 \begin{equation}
-	\text{W}(Q||P) = \frac{1}{K}\sup\limits_{\|f\|_L\leqslant K}\left( \mathbb{E}_{x\sim Q} [f(x)] - \mathbb{E}_{x\sim P} [f(x)]\right),
+	\text{W}(Q||P) = \frac{1}{K}\sup\limits_{\|f\|_L\leqslant K}\left( \mathbb{E}_{\mathbf{x}\sim Q} [f(x)] - \mathbb{E}_{\mathbf{x}\sim P} [f(\mathbf{x})]\right),
 \end{equation}
 где $\|f\|_L\leqslant K$ -- $K$-липшицевы функции, а значит если параметризовать некоторое семейство таких функций нейросетью с параметрами $\varphi$ можно получить следующую задачу максимизации, эквивалентную минимизации расстояния Вассерштайна:
 \begin{equation}
 	\begin{cases}
-	\max\limits_{\varphi}\left(\mathbb{E}_{x\sim Q} [f_\varphi(x)] - \mathbb{E}_{x\sim P_\theta} [f_\varphi(x)]\right),\\
-		\|f\|_L \leqslant K,
+	\max\limits_{\varphi}\left(\mathbb{E}_{\mathbf{x}\sim Q} [f_\varphi(\mathbf{x})] - \mathbb{E}_{\mathbf{x}\sim P_\theta} [f_\varphi(\mathbf{x})]\right),\\
+		\|f_\varphi\|_L \leqslant K,
 \end{cases}
 \end{equation}
 где $\theta$ -- параметры генератора для распределения $P$. Таким образом, в терминах диффузионной модели получаем следующую задачу условной оптимизации:
 \begin{equation}
 	\begin{cases}
 	\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\mathbf{x_t})}\left[\mathbb{E}_{q(\mathbf{x_{t-1}}|\mathbf{x_t})}\left[f_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)\right] - \mathbb{E}_{p_\theta(\mathbf{x_{t-1}}|\mathbf{x_t})}\left[f_\varphi(\mathbf{x_{t-1}}, \mathbf{x_t}, t)\right]\right],\\
-	\|f\|_L \leqslant K.
+	\|f_\varphi\|_L \leqslant K.
 	\end{cases}
 \end{equation}\\
 
@@ -243,10 +244,10 @@ F-дивергенции -- не единственный класс функц�
 \subsection{Диффузионная модель}
 Для начала обучаем простую диффузионную модель аналогично \cite{https://doi.org/10.48550/arxiv.2006.11239} и измерим FID-score.
 
-В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net архитектуры. Для различного количества шагов T от 10 до 1000 обратного диффузионного процесса считаем метрику и строим график  FID(T) (рис. \ref{ddpm_fid}). Используем встроенный оптимизатор Adam из PyTorch с убывающим по косинусу learning rate.
+В качестве модели для восстановления шума в обратном проходе используем собственную реализацию U-Net \cite{ronneberger2015unet} архитектуры. Для различного количества шагов T от 10 до 1000 обратного диффузионного процесса считаем метрику и строим график  FID(T) (рис. \ref{ddpm_fid}). Используем встроенный оптимизатор Adam из PyTorch с убывающим по косинусу learning rate.
 
 \begin{figure}[H]
-	\centering{\includegraphics[scale = 0.4]{../code/DDPM_FID_FMNIST.png}}
+	\centering{\includegraphics[scale = 0.4]{../code/figures/DDPM_FID_FMNIST.png}}
 	\caption{Зависимость FID от количества шагов для DDPM}\label{ddpm_fid}
 \end{figure}
 
@@ -255,19 +256,19 @@ F-дивергенции -- не единственный класс функц�
 \begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDPM_50.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDPM_50.png}
 		\caption{T = 50}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDPM_300.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDPM_300.png}
 		\caption{T = 300}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDPM_1000.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDPM_1000.png}
 		\caption{T = 1000}
 	\end{subfigure}
 \caption{Семплы из DDPM для различных значений T}\label{ddpm_samples}
@@ -279,26 +280,26 @@ F-дивергенции -- не единственный класс функц�
 Целью использования неявной модели является существенное уменьшение числа шагов обратного процесса, поэтому будем рассматривать различные T от 1 до 10. Для них посчитаем FID, построим график (рис. \ref{ddgan_fid}) и рассмотрим сгенерированные моделью примеры. (рис. \ref{ddgan_samples})
 
 \begin{figure}[H]	
-	\centering{\includegraphics[scale = 0.4]{../code/DDGAN_FID_FMNIST.png}}
+	\centering{\includegraphics[scale = 0.4]{../code/figures/DDGAN_FID_FMNIST.png}}
 	\caption{Зависимость FID от количества шагов для DDGAN}\label{ddgan_fid}
 \end{figure}
 
 \begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_3.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_3.png}
 		\caption{T = 3}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_5.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_5.png}
 		\caption{T = 5}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_10.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_10.png}
 		\caption{T = 10}
 	\end{subfigure}
 	\caption{Семплы из DDGAN для различных значений T}\label{ddgan_samples}	
@@ -313,26 +314,26 @@ F-дивергенции -- не единственный класс функц�
 Для минимизации расстояния Вассерштайна в одной из моделей необходимо рассматривать только $K$-липшицевы функции, моделируемые одной из соревнующихся сетей -- критиком. $K$-липшицевость влечет почти всюду ограниченность модуля градиента константой $K$. Поэтому, для того, чтобы удовлетворить этому ограничению, воспользуемся дополнительным градиентным штрафом см. \cite{DBLP:journals/corr/GulrajaniAADC17}, который есть дополнительное слагаемое в функции потерь. 
 
 \begin{figure}[H]	
-	\centering{\includegraphics[scale = 0.4]{../code/DDGAN_ALL_FID_FMNIST.png}}
+	\centering{\includegraphics[scale = 0.4]{../code/figures/DDGAN_ALL_FID_FMNIST.png}}
 	\caption{Зависимость FID от количества шагов для различных GAN моделей в диффузионной сети}\label{ddgan_all_fid}
 \end{figure}
 
 \begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_h2_3.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_h2_3.png}
 		\caption{T = 3}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_h2_5.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_h2_5.png}
 		\caption{T = 5}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_h2_10.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_h2_10.png}
 		\caption{T = 10}
 	\end{subfigure}
 	\caption{Семплы из DDGAN c $H^2$}\label{ddgan_h2_samples}	
@@ -341,19 +342,19 @@ F-дивергенции -- не единственный класс функц�
 \begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_rkl_3.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_rkl_3.png}
 		\caption{T = 3}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_rkl_5.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_rkl_5.png}
 		\caption{T = 5}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_rkl_10.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_rkl_10.png}
 		\caption{T = 10}
 	\end{subfigure}
 	\caption{Семплы из DDGAN c reversed-KL}\label{ddgan_rkl_samples}	
@@ -362,19 +363,19 @@ F-дивергенции -- не единственный класс функц�
 \begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_tv_3.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_tv_3.png}
 		\caption{T = 3}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_tv_5.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_tv_5.png}
 		\caption{T = 5}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_tv_10.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_tv_10.png}
 		\caption{T = 10}
 	\end{subfigure}
 	\caption{Семплы из DDGAN c total variation}\label{ddgan_tv_samples}	
@@ -383,19 +384,19 @@ F-дивергенции -- не единственный класс функц�
 \begin{figure}[H]
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_wd_3.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_wd_3.png}
 		\caption{T = 3}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_wd_5.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_wd_5.png}
 		\caption{T = 5}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.3\linewidth}
 		\centering
-		\includegraphics[scale=0.3]{../code/generated_DDGAN_wd_10.png}
+		\includegraphics[scale=0.3]{../code/figures/generated_DDGAN_wd_10.png}
 		\caption{T = 10}
 	\end{subfigure}
 	\caption{Семплы из DDGAN c Wasserstein distance}\label{ddgan_wd_samples}	

@@ -71,7 +71,7 @@
 			
 			\begin{block}{Предлагается}
 				\smallskip
-				Использовать неявную генеративную модель -- состязательну сеть на каждом шаге диффузионного процесса
+				Использовать неявную генеративную модель -- состязательную сеть -- на каждом шаге диффузионного процесса
 			\end{block}	
 		
 			\bigskip
@@ -212,7 +212,7 @@
 		\end{block}
 	
 	\begin{block}{Метод}
-			По аналогии с классической диффузионной моделью будем минимизировать некоторую меру близости между распределениями $D_{adv}$
+			По аналогии с классической диффузионной моделью будем минимизировать некоторую меру близости между распределениями $D_{adv}$, но при помощи неявной модели
 			 \begin{equation*}
 			\sum\limits_{t=1}^n \mathbb{E}_{\textbf{x}_1\dots \textbf{x}_T} D_{adv}\left(q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)~||~p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)  \right) \xrightarrow[\theta]{}\min
 		\end{equation*}
@@ -225,28 +225,156 @@
 \begin{frame}
 	\frametitle{Введение GAN моделей}
 	\begin{block}{Дискриминатор}
-		Будем тренировать дискриминатор отличать сгенерированные генератором, обусловленным на $\textbf{x}_{t-1}^{fake}$, семплы $\textbf{x}_t^{fake}$ от полученных зашумлением семплов из исходного распределения $\textbf{x}_t^{real}$.\\
-		Зададим в таком случае дискриминатор как $D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)$, где $\varphi$ -- обучаемые параметры.\\
-		Для начала используем схему тренировки для non-saturating GAN\footnote{\url{https://doi.org/10.48550/arxiv.1406.2661}}, как ранее было предложено\footnote{\url{https://doi.org/10.48550/arxiv.2112.07804}}, тогда задача минимизации для дискриминатора:
+		Зададим дискриминатор как $D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)$, где $\varphi$ -- обучаемые параметры.\\
+		Для начала используем схему тренировки стандартного GAN\footnote{\url{https://doi.org/10.48550/arxiv.1406.2661}}, как ранее было предложено\footnote{\url{https://doi.org/10.48550/arxiv.2112.07804}}, тогда задача минимизации для дискриминатора:
 		$$  \min\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[-\log{ (D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t) ) }] + \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}[-\log{  (1 - D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))  }]]$$
 		\end{block}
-\end{frame}	
-	
-\begin{frame}
-	\frametitle{Введение GAN моделей}		
+		
 	\begin{block}{Генератор}
-		Введем генератор $G_\theta(x_{t-1}^{fake}, \textbf{z}, t)$ с параметрами $\theta$, латентной переменной $\textbf{z}\sim \mathcal{N}(0, \textbf{I})$, обусловленный на $x_{t-1}^{fake}$ и порождающий семплы из исходного распределения. В таком случае целевое распределение в обратном диффузионном процессе:
+		Введем генератор $G_\theta(\textbf{x}_{t-1}^{fake}, \textbf{z}, t)$ с параметрами $\theta$, латентной переменной $\textbf{z}\sim \mathcal{N}(0, \textbf{I})$, обусловленный на $\textbf{x}_{t-1}^{fake}$ и порождающий семплы из исходного распределения. В таком случае целевое распределение в обратном диффузионном процессе:
 		$$p_\theta(\textbf{x}_{t-1}|\textbf{x}_t) := \int p_\theta(\textbf{x}_0|\textbf{x}_t)q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)d\textbf{x}_0 =\int p(z)q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0 = G_\theta(\textbf{x}_t, \textbf{z}, t))d\textbf{z}$$
 	\end{block}
 		При известном дискриминаторе тренируем генератор на максимизацию 
 		\begin{equation*}
 			\max\limits_\theta\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[\log{(D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}]
 		\end{equation*}
-
 \end{frame}
 
 
+\begin{frame}
+	\frametitle{Альтернативные схемы тренировки}
+	\begin{block}{Семейство F-дивергенций}
+		F-дивергенции -- семейство функций, определяемых как
+		\begin{equation*}
+				D_f(Q||P) = \int_\mathcal{X} p(\textbf{x}) f\left(\frac{q(\textbf{x})}{p(\textbf{x})}\right)d\textbf{x},
+		\end{equation*}
+		где $f$ -- выпуклая непрерывная слева функция, такая что $f(1) = 0$ называемая порождающей.\\
+		Произвольную f-дивергенцию можно оценить снизу, используя сопряженную к $f$ функцию $f^*$:
+		\begin{equation*}
+			D_f(Q||P)\geqslant \sup\limits_{T \in \mathcal{T}}\left(\mathbb{E}_{\textbf{x}\sim Q} [T(\textbf{x})] - \mathbb{E}_{\textbf{x}\sim P} [f^*(T(\textbf{x}))] \right),
+		\end{equation*}
+		где $\mathcal{T}$ -- произвольный класс функций $T:\mathcal{X} \to \mathbb{R}$.
+	\end{block}
+	\begin{block}{Минимизируемый функционал}
+		Генератор распределения $P$: $G = G_\theta$, \\
+		модель $V_\omega$ приближающая функцию $T$: $T = T_\omega = g_f(V_\omega)$, где $g_f$ --  функция активации. \\
+		В таком случае целевой фукнционал: 
+		\begin{equation*}
+			F(\theta, \omega) = \mathbb{E}_{\textbf{x}\sim Q} [g_f(V_\mathbf{\omega}(\textbf{x}))] - \mathbb{E}_{ \textbf{x}\sim P_\mathbf{\theta}}[f^*(g_f(V_\mathbf{\omega}(\textbf{x})))].
+		\end{equation*}
+		Будем подставлять частные случаи этого функционала в схему тренировки диффузионной модели аналогично стандартному GAN.
+	\end{block}
+\end{frame}
 
+\begin{frame}
+	\frametitle{Альтернативные схемы тренировки}
+	\begin{block}{Рассматриваемые частные случаи}
+		\begin{itemize}
+			\item Квадрат растояния Хелингера
+				\begin{equation*}
+					\text{H}^2(Q||P) - \frac{1}{2}\int_\mathcal{X} \left(\sqrt{q(\textbf{x})} - \sqrt{p(\textbf{x})}\right)^2d\textbf(x), ~~~f^*_{H^2}(t) = \frac{t}{1 - t}, ~~~ g_{f_{H^2}}(V) = 1 - \exp(V).
+				\end{equation*}
+				 \begin{equation*}
+					\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[- \exp{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}] - \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}[\exp{(-V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}]\right].
+				\end{equation*}
+			\item Обратная KL-дивергенция
+				\begin{equation*}
+					\text{Reverse-KL}(Q||P) = \text{KL}(P||Q) = \int\limits_\mathcal{X} p(\textbf{x})\log{\frac{p(\textbf{x})}{q(\textbf{x})}}d\textbf{x}, ~~~ f^*_{R-KL}(t) = -1- \log({-t}),~~~ g_{f_{R-KL}}(V) = - \exp(V).
+				\end{equation*}
+				\begin{equation*}
+					\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[- \exp{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}] + \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}[1+V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)]\right].
+				\end{equation*}
+			\item Total variation distance
+				\begin{equation*}
+					\delta (Q||P) = \sup\limits_x|Q(x) - P(x)|,~~~f^*_{\delta}(t) = t, ~~~ g_{f_{\delta}}(V) = \frac{1}{2}\tanh{(v)}.
+				\end{equation*}
+				\begin{equation*}
+					\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}\left[\tanh{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}\right] - \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}\left[\tanh{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}\right]\right].
+				\end{equation*}	
+		\end{itemize}
+	\end{block}	
+\end{frame}
+
+\begin{frame}
+\frametitle{Альтернативные схемы тренировки}
+	\begin{block}{Wasserstein distance}
+		Отдельно рассматриваем wasserstein distance -- другую меру близости распределений, не входящую в семейство f-дивергенций
+		\begin{equation*}
+			\text{W}(Q||P) = \inf\limits_{\gamma \in \Gamma(Q,P)} \mathbb{E}_{(\textbf{x},\textbf{y})\sim \gamma} \|\textbf{x}-\textbf{y}\|,
+		\end{equation*}
+		Где $\Gamma$ -- множество всех совместных распределений  $\gamma(x,y)$ таких, что $\int \gamma(\textbf{x},\textbf{y}) d\textbf{x} = P(\textbf{y}),~\int \gamma(\textbf{x},\textbf{y}) d\textbf{y} = Q(\textbf{x})$.\\
+		\smallskip
+		Пользуясь, двойственостью Канторовича-Рубинштейна получаем:		
+		\begin{equation*}
+			\begin{cases}
+				\max\limits_{\varphi}\left(\mathbb{E}_{\textbf{x}\sim Q} [f_\varphi(\textbf{x})] - \mathbb{E}_{\textbf{x}\sim P_\theta} [f_\varphi(\textbf{x})]\right),\\
+				\|f\|_L \leqslant K,
+			\end{cases}
+		\end{equation*}
+		где $\|f_\varphi\|_L\leqslant K$ -- $K$-липшицевы функции, приближаемые нейросетью с параметрами $\varphi$,
+	    $\theta$ -- параметры генератора для распределения $P$.\\ 
+		\smallskip
+		Итоговая задача оптимизации:
+		\begin{equation*}
+			\begin{cases}
+				\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\mathbf{\textbf{x}_t})}\left[f_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)\right] - \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}\left[f_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)\right]\right],\\
+				\|f_\varphi\|_L \leqslant K.
+			\end{cases}
+		\end{equation*}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Вычислительный эксперимент}
+	\begin{block}{Цели}
+		\begin{itemize}
+			\item Анализ качества семплов в зависимости от количества шагов обратного процесса T для DDPM 		
+			\item Достижение сравнимого качества для малых $T \leqslant 10$ с использованием GAN
+			\item Анализ применимости альтернативных состязательных сетей
+		\end{itemize}		
+	\end{block}
+	\begin{block}{Метрика качества}
+		Fréchet inception distance или FID-score, в предположение нормальности вычисляется как:
+			 \begin{equation*}
+				\textbf{FID}({\mathcal {N}}(\mathbf{\mu},\Sigma),{\mathcal {N}}(\mathbf{\mu} ',\Sigma '))^{2}=\lVert \mathbf{\mu} -\mathbf{\mu} '\rVert _{2}^{2}+\textbf{tr} \left(\Sigma +\Sigma '-2\left(\Sigma ^{\frac {1}{2}}\cdot \Sigma '\cdot \Sigma ^{\frac {1}{2}}\right)^{\frac {1}{2}}\right).
+			\end{equation*}
+		В данное выражение подставляем выход модели InceptionV3\footnote{\url{https://doi.org/10.48550/arXiv.1512.00567}} для реальных и сгенерированных данных.
+	\end{block}
+	\begin{block}{Данные}
+		Fashion-MNIST\footnote{\url{http://arxiv.org/abs/1708.07747}} -- 60000 черно-белых картинок $28\times28$
+	\end{block}
+	\begin{block}{Архитектура}
+		Генеративная сеть -- собственная реализация U-Net\footnote{\url{http://arxiv.org/abs/1505.04597}} модели.\\
+		 Дискриминативная -- сжимающая половина генеративной и выходной линейный слой.
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+		\begin{columns}
+			\begin{column}{0.8\textwidth}
+				\begin{block}{Диффузионная модель}
+				 	\begin{figure}[H]
+				 		\centering{\includegraphics[scale=0.37]{figures/DDPM_FID_FMNIST.png}}
+				 	\end{figure}
+			 	\end{block}
+			\end{column}
+			\begin{column}{0.23\textwidth}
+					\begin{figure}[H]
+						\subfloat[T = 50]{%
+							\includegraphics[width=0.8\columnwidth]{figures/generated_DDPM_50.png}}
+						
+						\subfloat[T = 300]{%
+							\includegraphics[width=0.8\columnwidth]{figures/generated_DDPM_300.png}}
+					
+						\subfloat[T = 1000]{%
+							\includegraphics[width=0.8\columnwidth]{figures/generated_DDPM_1000.png}}
+					\end{figure}	
+			\end{column}
+		\end{columns}
+
+
+\end{frame}
 
 
 \end{document}
