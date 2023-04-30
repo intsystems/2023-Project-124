@@ -372,9 +372,141 @@
 					\end{figure}	
 			\end{column}
 		\end{columns}
-
-
 \end{frame}
 
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+	\begin{columns}
+		\begin{column}{0.8\textwidth}
+			\begin{block}{DDGAN с JS-дивергенцией}
+				\begin{figure}[H]
+					\centering{\includegraphics[scale=0.37]{figures/DDGAN_FID_FMNIST.png}}
+				\end{figure}
+			\end{block}
+		\end{column}
+		\begin{column}{0.23\textwidth}
+			\begin{figure}[H]
+				\subfloat[T = 3]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_3.png}}
+				
+				\subfloat[T = 5]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_5.png}}
+				
+				\subfloat[T = 10]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_10.png}}
+			\end{figure}	
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+	\begin{columns}
+		\begin{column}{0.8\textwidth}
+			\begin{block}{DDGAN с $H^2$}
+				\begin{figure}[H]
+					\centering{\includegraphics[scale=0.37]{figures/DDGAN_H2_FID_FMNIST.png}}
+				\end{figure}
+			\end{block}
+		\end{column}
+		\begin{column}{0.23\textwidth}
+			\begin{figure}[H]
+				\subfloat[T = 3]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_h2_3.png}}
+				
+				\subfloat[T = 5]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_h2_5.png}}
+				
+				\subfloat[T = 10]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_h2_10.png}}
+			\end{figure}	
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+	\begin{columns}
+		\begin{column}{0.8\textwidth}
+			\begin{block}{DDGAN с обратной KL дивергенцией}
+				\begin{figure}[H]
+					\centering{\includegraphics[scale=0.37]{figures/DDGAN_RKL_FID_FMNIST.png}}
+				\end{figure}
+			\end{block}
+		\end{column}
+		\begin{column}{0.23\textwidth}
+			\begin{figure}[H]
+				\subfloat[T = 3]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_rkl_3.png}}
+				
+				\subfloat[T = 5]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_rkl_5.png}}
+				
+				\subfloat[T = 10]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_rkl_10.png}}
+			\end{figure}	
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+	\begin{columns}
+		\begin{column}{0.8\textwidth}
+			\begin{block}{DDGAN с total variation}
+				\begin{figure}[H]
+					\centering{\includegraphics[scale=0.37]{figures/DDGAN_TV_FID_FMNIST.png}}
+				\end{figure}
+			\end{block}
+		\end{column}
+		\begin{column}{0.23\textwidth}
+			\begin{figure}[H]
+				\subfloat[T = 3]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_tv_3.png}}
+				
+				\subfloat[T = 5]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_tv_5.png}}
+				
+				\subfloat[T = 10]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_tv_10.png}}
+			\end{figure}	
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+	\begin{columns}
+		\begin{column}{0.8\textwidth}
+			\begin{block}{DDGAN с wasserstein distance}
+				\begin{figure}[H]
+					\centering{\includegraphics[scale=0.37]{figures/DDGAN_WD_FID_FMNIST.png}}
+				\end{figure}
+			\end{block}
+		\end{column}
+		\begin{column}{0.23\textwidth}
+			\begin{figure}[H]
+				\subfloat[T = 3]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_wd_3.png}}
+				
+				\subfloat[T = 5]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_wd_5.png}}
+				
+				\subfloat[T = 10]{%
+					\includegraphics[width=0.8\columnwidth]{figures/generated_DDGAN_wd_10.png}}
+			\end{figure}	
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+		\begin{block}{Сравнение различных схем тренировки}
+			\begin{figure}[H]
+					\centering{\includegraphics[scale=0.45]{figures/DDGAN_ALL_FID_FMNIST.png}}
+			\end{figure}
+		\end{block}
+
+\end{frame}
 
 \end{document}
