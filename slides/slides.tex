@@ -14,6 +14,7 @@
 
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{longtable}
 % \usepackage{subfigure}
 
 \usepackage{multicol}
@@ -155,7 +156,6 @@
 \end{columns}
 			\blfootnote{\url{https://doi.org/10.48550/arxiv.2112.07804}}
 \end{frame}
-
 
 
 \begin{frame}
@@ -506,7 +506,39 @@
 					\centering{\includegraphics[scale=0.45]{figures/DDGAN_ALL_FID_FMNIST.png}}
 			\end{figure}
 		\end{block}
+\end{frame}
 
+\begin{frame}
+	\frametitle{Вычислительный эксперимент}
+	\begin{block}{Сравнение различных схем тренировки}
+		\begin{longtable}{|c|c|}
+			\hline
+			Модель &  FID\\
+			\hline
+			DDPM &  28.9\\ 
+			\hline
+			JS DDGAN & 34.3 \\
+			\hline
+			H$^2$ DDGAN &  36.3\\
+			\hline
+			Reversed-KL DDGAN &  76.6\\
+			\hline
+			Total variation DDGAN &  129.0\\
+			\hline
+			Wasserstein DDGAN &  114.4\\
+			\hline
+			\caption*{FID-score для максимального числа шагов}
+		\end{longtable}
+	\end{block}
+	\begin{block}{Итоги эксперимента}
+		\begin{itemize}
+			\item Количество шагов в диффузионной модели успешно снижено на 2 порядка при незначительном падении качества семплов
+			\item Стандартный (JS) DDGAN показывает себя лучше остальных
+			\item DDGAN с H$^2$ достигает сравнимого со стандартным качества
+			\item Обучение всех DDGAN кроме стандартного склонно к расбалансировке и требует тщательного подбора гиперпарамтеров
+			
+		\end{itemize}
+	\end{block}
 \end{frame}
 
 \end{document}
