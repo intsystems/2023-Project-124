@@ -60,30 +60,28 @@
 	
 			\begin{block}{Цель}
 				\smallskip
-			Модификацировать классическую диффузионную модель для существенного ускорения процесса семплирования
+			Исследовать способы моделирования мультимодального распределения при генеративном моделировании с помощью диффузионного процесса
 			\end{block}	
-		
-			\bigskip
-		
-			\begin{block}{Задача}
+			\vfill
+			\begin{block}{Проблема}
 					\smallskip
-				Проанализировать способы моделирования мультимодального распределения в обратном диффузионном процессе
+				Стандартный диффузионный процесс моделирует унимодальное распределение при обратном проходе. Процесс семплирования из стандартной модели требует длительного времени
 			\end{block}	
-		
-			\bigskip
-			
+			\vfill
 			\begin{block}{Предлагается}
+				\smallskip
+				Модифицировать классическую диффузионную модель для существенного ускорения процесса семплирования
+			\end{block}	
+			\vfill
+			\begin{block}{Решение}
 				\smallskip
 				Использовать неявную генеративную модель -- состязательную сеть -- на каждом шаге диффузионного процесса
 			\end{block}	
-		
-			\bigskip
-		
+			\vfill
 			\begin{block}{Необходимо}
 				\smallskip
-				Рассмотреть различные постановки минимизацонной задачи для используемой модели
+				Рассмотреть различные постановки минимизационной задачи для используемой модели
 			\end{block}	
-
 	     \end{column}
 	\end{columns}
 
@@ -127,7 +125,7 @@
 					
 					\item Обратный: 
 					\begin{equation*}
-					p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)\!\! \underset{\text{T} \gg 1}{ \approx}\!\!\! \mathcal{N}(\textbf{x}_{t-1};\mu_\theta(\textbf{x}_t,t), \Sigma_\theta(\textbf{x}_t, t))
+						p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)\!\! \underset{\text{T} \gg 1}{ \approx}\!\!\! \mathcal{N}(\textbf{x}_{t-1};\mu_{\boldsymbol{\theta}}(\textbf{x}_t, t), \Sigma_{\boldsymbol{\theta}}(\textbf{x}_t, t))
 					\end{equation*}
 			
 				\end{itemize}
@@ -152,7 +150,7 @@
 			
 			\begin{itemize}	
 				\item Марковость обратного процесса
-				\item Нормальность и следовательно унимодальность $p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)$
+				\item Нормальность и следовательно унимодальность $p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)$
 			\end{itemize}
 		
 		\end{block}
@@ -201,11 +199,11 @@
 			\begin{block}{Обратный процесс}
 				В приближении $T\gg 1$ распределение каждого следующего семпла в обратном процессе обусловлено только на предыдущий, а также нормально.
 				\begin{equation*}
-					p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)\!\! \underset{\text{T} \gg 1}{ \approx}\!\!\! \mathcal{N}(\textbf{x}_{t-1};\mu_\theta(\textbf{x}_t,t), \Sigma_\theta(\textbf{x}_t, t))
+					p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)\!\! \underset{\text{T} \gg 1}{ \approx}\!\!\! \mathcal{N}(\textbf{x}_{t-1};\mu_{\boldsymbol{\theta}}(\textbf{x}_t,t), \Sigma_{\boldsymbol{\theta}}(\textbf{x}_t, t))
 				\end{equation*}
 			Если $\textbf{X}  = (\textbf{x}_0^1\dots\textbf{x}_0^n)\sim p_0(\textbf{x})$, то из метода максимального правдоподобия:
 			\begin{equation*}
-				\theta =\argmax\limits_{\theta} p(\textbf{X}|\theta) = \argmax\limits_{\theta} \sum\limits_{i=1}^n \log{p(\textbf{x}_0^i|\theta)}
+				{\boldsymbol{\theta}}^* =\argmax\limits_{{\boldsymbol{\theta}}} p(\textbf{X}|{\boldsymbol{\theta}}) = \argmax\limits_{{\boldsymbol{\theta}}} \sum\limits_{i=1}^n \log{p(\textbf{x}_0^i|{\boldsymbol{\theta}})}
 			\end{equation*}			
 			\end{block}
 		\end{column}
@@ -213,7 +211,7 @@
 \medskip
 После некоторых математических преобразований получаем минимизационную задачу:
  \begin{equation*}
-	\sum\limits_{t=1}^n \mathbb{E}_{\textbf{x}_1\dots \textbf{x}_T} KL\left(q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)~||~p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)  \right) \xrightarrow[\theta]{}\min
+	\sum\limits_{t=1}^n \mathbb{E}_{\textbf{x}_1\dots \textbf{x}_T} KL\left(q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)~||~p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)  \right) \xrightarrow[{\boldsymbol{\theta}}]{}\min
 \end{equation*}
 \blfootnote{\url{https://doi.org/10.48550/arxiv.2006.11239}}
 
@@ -222,7 +220,7 @@
 \begin{frame}
 	\frametitle{Постановка задачи}
 		\begin{block}{Проблема}
-			При существенном уменьшении числа шагов обратного диффузионного процесса ($T\gtrsim 1$) предположения марковости и тем более нормальности $p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)$ очевидно не верны. Кроме того, $p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)$ мультимодальное.
+			При существенном уменьшении числа шагов обратного диффузионного процесса ($T\gtrsim 1$) предположения марковости и тем более нормальности $p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)$ очевидно не верны. Кроме того, $p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)$ мультимодальное.
 		\end{block}
 	
 		\begin{block}{Задача}
@@ -230,11 +228,11 @@
 		\end{block}
 	
 	\begin{block}{Метод}
-			По аналогии с классической диффузионной моделью будем минимизировать некоторую меру близости между распределениями $D_{adv}$, но при помощи неявной модели
+			По аналогии с классической диффузионной моделью будем минимизировать некоторую меру близости между распределениями $\textbf{D}_{adv}$, но при помощи неявной модели
 			 \begin{equation*}
-			\sum\limits_{t=1}^n \mathbb{E}_{\textbf{x}_1\dots \textbf{x}_T} D_{adv}\left(q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)~||~p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)  \right) \xrightarrow[\theta]{}\min
+			\sum\limits_{t=1}^n \mathbb{E}_{\textbf{x}_1\dots \textbf{x}_T} \textbf{D}_{adv}\left(q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)~||~p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)  \right) \xrightarrow[{\boldsymbol{\theta}}]{}\min
 		\end{equation*}
-			где $D_{adv}$, в случае состязательных сетей, есть некоторая f-дивергенция или метрика Вассерштайна.
+			где $\textbf{D}_{adv}$, в случае состязательных сетей, есть некоторая f-дивергенция или метрика Вассерштайна.
 		\end{block}
 
 \end{frame}
@@ -243,18 +241,18 @@
 \begin{frame}
 	\frametitle{Введение GAN моделей}
 	\begin{block}{Дискриминатор}
-		Зададим дискриминатор как $D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)$, где $\varphi$ -- обучаемые параметры.\\
+		Зададим дискриминатор как $\textbf{D}_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t)$, где ${\boldsymbol{\varphi}}$ -- обучаемые параметры.\\
 		Для начала используем схему тренировки стандартного GAN\footnote{\url{https://doi.org/10.48550/arxiv.1406.2661}}, как ранее было предложено\footnote{\url{https://doi.org/10.48550/arxiv.2112.07804}}, тогда задача минимизации для дискриминатора:
-		$$  \min\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[-\log{ (D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t) ) }] + \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}[-\log{  (1 - D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))  }]]$$
+		$$  \min\limits_{\boldsymbol{\varphi}}\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[-\log{ (\textbf{D}_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t) ) }] + \mathbb{E}_{p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)}[-\log{  (1 - \textbf{D}_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))  }]]$$
 		\end{block}
 		
 	\begin{block}{Генератор}
-		Введем генератор $G_\theta(\textbf{x}_{t-1}^{fake}, \textbf{z}, t)$ с параметрами $\theta$, латентной переменной $\textbf{z}\sim \mathcal{N}(0, \textbf{I})$, обусловленный на $\textbf{x}_{t-1}^{fake}$ и порождающий семплы из исходного распределения. В таком случае целевое распределение в обратном диффузионном процессе:
-		$$p_\theta(\textbf{x}_{t-1}|\textbf{x}_t) := \int p_\theta(\textbf{x}_0|\textbf{x}_t)q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)d\textbf{x}_0 =\int p(z)q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0 = G_\theta(\textbf{x}_t, \textbf{z}, t))d\textbf{z}$$
+		Введем генератор $\textbf{G}_{\boldsymbol{\theta}}(\textbf{x}_{t-1}^{fake}, \textbf{z}, t)$ с параметрами ${\boldsymbol{\theta}}$, латентной переменной $\textbf{z}\sim \mathcal{N}(0, \textbf{I})$, обусловленный на $\textbf{x}_{t-1}^{fake}$ и порождающий семплы из исходного распределения. В таком случае целевое распределение в обратном диффузионном процессе:
+		$$p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t) := \int p_{\boldsymbol{\theta}}(\textbf{x}_0|\textbf{x}_t)q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0)d\textbf{x}_0 =\int p(z)q(\textbf{x}_{t-1}|\textbf{x}_t, \textbf{x}_0 = \textbf{G}_{\boldsymbol{\theta}}(\textbf{x}_t, \textbf{z}, t))d\textbf{z}$$
 	\end{block}
 		При известном дискриминаторе тренируем генератор на максимизацию 
 		\begin{equation*}
-			\max\limits_\theta\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[\log{(D_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}]
+			\max\limits_{\boldsymbol{\theta}}\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[\log{(\textbf{D}_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))}]
 		\end{equation*}
 \end{frame}
 
@@ -264,21 +262,21 @@
 	\begin{block}{Семейство F-дивергенций}
 		F-дивергенции -- семейство функций, определяемых как
 		\begin{equation*}
-				D_f(Q||P) = \int_\mathcal{X} p(\textbf{x}) f\left(\frac{q(\textbf{x})}{p(\textbf{x})}\right)d\textbf{x},
+				\textbf{D}_f(Q||P) = \int_\mathcal{X} p(\textbf{x}) f\left(\frac{q(\textbf{x})}{p(\textbf{x})}\right)d\textbf{x},
 		\end{equation*}
 		где $f$ -- выпуклая непрерывная слева функция, такая что $f(1) = 0$ называемая порождающей.\\
 		Произвольную f-дивергенцию можно оценить снизу, используя сопряженную к $f$ функцию $f^*$:
 		\begin{equation*}
-			D_f(Q||P)\geqslant \sup\limits_{T \in \mathcal{T}}\left(\mathbb{E}_{\textbf{x}\sim Q} [T(\textbf{x})] - \mathbb{E}_{\textbf{x}\sim P} [f^*(T(\textbf{x}))] \right),
+			\textbf{D}_f(Q||P)\geqslant \sup\limits_{T \in \mathcal{T}}\left(\mathbb{E}_{\textbf{x}\sim Q} [T(\textbf{x})] - \mathbb{E}_{\textbf{x}\sim P} [f^*(T(\textbf{x}))] \right),
 		\end{equation*}
 		где $\mathcal{T}$ -- произвольный класс функций $T:\mathcal{X} \to \mathbb{R}$.
 	\end{block}
 	\begin{block}{Минимизируемый функционал}
-		Генератор распределения $P$: $G = G_\theta$, \\
-		модель $V_\omega$ приближающая функцию $T$: $T = T_\omega = g_f(V_\omega)$, где $g_f$ --  функция активации. \\
-		В таком случае целевой фукнционал: 
+		Генератор распределения $P$: $\textbf{G} = \textbf{G}_{\boldsymbol{\theta}}$, \\
+		модель $V_{\boldsymbol{\omega}}$ приближающая функцию $T$: $T = T_{\boldsymbol{\omega}} = g_f(V_\omega)$, где $g_f$ --  функция активации. \\
+		В таком случае целевой функционал: 
 		\begin{equation*}
-			F(\theta, \omega) = \mathbb{E}_{\textbf{x}\sim Q} [g_f(V_\mathbf{\omega}(\textbf{x}))] - \mathbb{E}_{ \textbf{x}\sim P_\mathbf{\theta}}[f^*(g_f(V_\mathbf{\omega}(\textbf{x})))].
+			F({\boldsymbol{\theta}}, {\boldsymbol{\omega}}) = \mathbb{E}_{\textbf{x}\sim Q} [g_f(V_{\boldsymbol{\omega}}(\textbf{x}))] - \mathbb{E}_{ \textbf{x}\sim P_{\boldsymbol{\theta}}}[f^*(g_f(V_{\boldsymbol{\omega}}(\textbf{x})))].
 		\end{equation*}
 		Будем подставлять частные случаи этого функционала в схему тренировки диффузионной модели аналогично стандартному GAN.
 	\end{block}
@@ -293,21 +291,21 @@
 					\text{H}^2(Q||P) - \frac{1}{2}\int_\mathcal{X} \left(\sqrt{q(\textbf{x})} - \sqrt{p(\textbf{x})}\right)^2d\textbf(x), ~~~f^*_{H^2}(t) = \frac{t}{1 - t}, ~~~ g_{f_{H^2}}(V) = 1 - \exp(V).
 				\end{equation*}
 				 \begin{equation*}
-					\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[- \exp{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}] - \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}[\exp{(-V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}]\right].
+					\min\limits_{\boldsymbol{\theta}}\max\limits_{\boldsymbol{\varphi}}\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[- \exp{(V_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))}] - \mathbb{E}_{p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)}[\exp{(-V_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))}]\right].
 				\end{equation*}
 			\item Обратная KL-дивергенция
 				\begin{equation*}
 					\text{Reverse-KL}(Q||P) = \text{KL}(P||Q) = \int\limits_\mathcal{X} p(\textbf{x})\log{\frac{p(\textbf{x})}{q(\textbf{x})}}d\textbf{x}, ~~~ f^*_{R-KL}(t) = -1- \log({-t}),~~~ g_{f_{R-KL}}(V) = - \exp(V).
 				\end{equation*}
 				\begin{equation*}
-					\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[- \exp{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}] + \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}[1+V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)]\right].
+					\min\limits_{\boldsymbol{\theta}}\max\limits_{\boldsymbol{\varphi}}\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}[-\exp{(V_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))}] + \mathbb{E}_{p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)}[1+V_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t)]\right].
 				\end{equation*}
 			\item Total variation distance
 				\begin{equation*}
 					\delta (Q||P) = \sup\limits_x|Q(x) - P(x)|,~~~f^*_{\delta}(t) = t, ~~~ g_{f_{\delta}}(V) = \frac{1}{2}\tanh{(v)}.
 				\end{equation*}
 				\begin{equation*}
-					\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}\left[\tanh{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}\right] - \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}\left[\tanh{(V_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t))}\right]\right].
+					\min\limits_{\boldsymbol{\theta}}\max\limits_{\boldsymbol{\varphi}}\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}\left[\tanh{(V_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))}\right] - \mathbb{E}_{p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)}\left[\tanh{(V_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t))}\right]\right].
 				\end{equation*}	
 		\end{itemize}
 	\end{block}	
@@ -322,21 +320,21 @@
 		\end{equation*}
 		Где $\Gamma$ -- множество всех совместных распределений  $\gamma(x,y)$ таких, что $\int \gamma(\textbf{x},\textbf{y}) d\textbf{x} = P(\textbf{y}),~\int \gamma(\textbf{x},\textbf{y}) d\textbf{y} = Q(\textbf{x})$.\\
 		\smallskip
-		Пользуясь, двойственостью Канторовича-Рубинштейна получаем:		
+		Пользуясь, двойственностью Канторовича-Рубинштейна получаем:		
 		\begin{equation*}
 			\begin{cases}
-				\max\limits_{\varphi}\left(\mathbb{E}_{\textbf{x}\sim Q} [f_\varphi(\textbf{x})] - \mathbb{E}_{\textbf{x}\sim P_\theta} [f_\varphi(\textbf{x})]\right),\\
+				\max\limits_{\boldsymbol{\varphi}}\left(\mathbb{E}_{\textbf{x}\sim Q} [f_{\boldsymbol{\varphi}}(\textbf{x})] - \mathbb{E}_{\textbf{x}\sim P_{\boldsymbol{\theta}}} [f_\varphi(\textbf{x})]\right),\\
 				\|f\|_L \leqslant K,
 			\end{cases}
 		\end{equation*}
-		где $\|f_\varphi\|_L\leqslant K$ -- $K$-липшицевы функции, приближаемые нейросетью с параметрами $\varphi$,
-	    $\theta$ -- параметры генератора для распределения $P$.\\ 
+		где $\|f_{\boldsymbol{\varphi}}\|_L\leqslant K$ -- $K$-липшицевы функции, приближаемые нейросетью с параметрами ${\boldsymbol{\varphi}}$,
+	    ${\boldsymbol{\theta}}$ -- параметры генератора для распределения $P$.\\ 
 		\smallskip
 		Итоговая задача оптимизации:
 		\begin{equation*}
 			\begin{cases}
-				\min\limits_\theta\max\limits_\varphi\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\mathbf{\textbf{x}_t})}\left[f_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)\right] - \mathbb{E}_{p_\theta(\textbf{x}_{t-1}|\textbf{x}_t)}\left[f_\varphi(\textbf{x}_{t-1}, \textbf{x}_t, t)\right]\right],\\
-				\|f_\varphi\|_L \leqslant K.
+				\min\limits_{\boldsymbol{\theta}}\max\limits_{\boldsymbol{\varphi}}\sum\limits_{t\geqslant 1}^n \mathbb{E}_{q(\textbf{x}_t)}\left[\mathbb{E}_{q(\textbf{x}_{t-1}|\textbf{x}_t)}\left[f_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t)\right] - \mathbb{E}_{p_{\boldsymbol{\theta}}(\textbf{x}_{t-1}|\textbf{x}_t)}\left[f_{\boldsymbol{\varphi}}(\textbf{x}_{t-1}, \textbf{x}_t, t)\right]\right],\\
+				\|f_{\boldsymbol{\varphi}}\|_L \leqslant K.
 			\end{cases}
 		\end{equation*}
 	\end{block}
@@ -553,8 +551,7 @@
 			\item Количество шагов в диффузионной модели успешно снижено на 2 порядка при незначительном падении качества семплов
 			\item Стандартный (JS) DDGAN показывает себя лучше остальных
 			\item DDGAN с H$^2$ достигает сравнимого со стандартным качества
-			\item Обучение всех DDGAN кроме стандартного склонно к расбалансировке и требует тщательного подбора гиперпарамтеров
-			
+			\item Обучение всех DDGAN кроме стандартного склонно к разбалансировке и требует тщательного подбора гиперпараметров
 		\end{itemize}
 	\end{block}
 \end{frame}
@@ -562,20 +559,16 @@
 \begin{frame}
 	\frametitle{Заключение}
 	\FontUP
-	\begin{columns}
-		\begin{column}{0.8\textwidth}
-			\begin{itemize}
-				\item Предложены различные способы моделирования мультимодального распределения в обратном диффузионном процессе
-				
-				\item Экспериментально подтверждена возможность использования различных подходов к обучению GAN моделей для использования их в диффузионной сети
-				
-				\item Проведено сравнение различных алгоритмов обучения на синтетических данных.
-				
-				\item В дальнейшем планируется исследовать способы выбора схемы тренировки в зависимости от входных данных
-			\end{itemize}
-		\end{column}
-	\end{columns}
-		
+		\begin{itemize}
+			\item Предложены различные способы моделирования мультимодального распределения в обратном диффузионном процессе
+			\vfill
+			\item Экспериментально подтверждена возможность использования различных подходов к обучению GAN моделей для использования их в диффузионной сети
+			\vfill
+			\item Проведено сравнение различных алгоритмов обучения на синтетических данных.
+			\vfill
+			\item В дальнейшем планируется исследовать способы выбора схемы тренировки в зависимости от входных данных
+		\end{itemize}		
 \end{frame}
+
 
 \end{document}
